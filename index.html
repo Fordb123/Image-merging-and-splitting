@@ -440,6 +440,8 @@
             max-width: 100%;
             height: auto;
             touch-action: none;
+            /* Evitar parpadeo en canvas */
+            will-change: transform;
         }
 
         /* ========================================
@@ -451,7 +453,10 @@
             cursor: move;
             z-index: 10;
             opacity: 0.8;
-            transition: opacity 0.2s;
+            /* Transición suave para cambios de posición */
+            transition: opacity 0.2s ease, background 0.2s ease;
+            /* Mejorar rendimiento al mover */
+            will-change: left, top;
         }
 
         .divider-line:hover, .divider-line.dragging {
@@ -543,7 +548,10 @@
             border-radius: var(--radius);
             overflow: hidden;
             border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            /* Evitar parpadeo durante actualizaciones */
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
 
         .thumbnail-item:hover {
@@ -556,6 +564,21 @@
             aspect-ratio: 1;
             object-fit: cover;
             display: block;
+            /* Suavizar la renderización de imágenes */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            animation: fadeInThumbnail 0.4s ease-out;
+        }
+
+        @keyframes fadeInThumbnail {
+            from { 
+                opacity: 0; 
+                transform: scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
         }
 
         .thumbnail-info {
@@ -871,7 +894,7 @@
         }
 
         .image-section {
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s ease-out;
         }
 
         @keyframes pulse {
@@ -881,6 +904,16 @@
 
         .loading {
             animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Animación suave para actualizar thumbnails */
+        @keyframes smoothUpdate {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .thumbnail-updating {
+            animation: smoothUpdate 0.2s ease-out;
         }
     </style>
 </head>
@@ -1038,6 +1071,11 @@
                 this.history = [];
                 this.historyIndex = -1;
                 
+                // Debounce para evitar parpadeo en previews
+                this.updatePreviewsDebounced = this.debounce(() => {
+                    this.updatePreviews();
+                }, 150);
+                
                 // Estado de carga
                 this.isLoaded = false;
                 this.isLoading = false;
@@ -1184,7 +1222,24 @@
                 // Guardar estado y actualizar UI
                 this.saveState();
                 this.renderLines();
+                // Actualizar previews sin debounce para respuesta inmediata
                 this.updatePreviews();
+            }
+
+            /**
+             * Función debounce para evitar parpadeo
+             * Ejecuta la función solo después de que dejen de llegar llamadas
+             */
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
             }
 
             /**
@@ -1201,6 +1256,7 @@
                 this.saveState();
                 this.updateInputs();
                 this.renderLines();
+                // Actualizar previews sin delay para respuesta inmediata
                 this.updatePreviews();
             }
 
@@ -1542,14 +1598,17 @@
                             line.style.top = `${newPos}%`;
                         }
                         
-                        // Actualizar previews en tiempo real
-                        this.updatePreviews();
+                        // Actualizar previews con debounce para evitar parpadeo
+                        // Solo se actualiza 150ms después de dejar de mover
+                        this.updatePreviewsDebounced();
                     };
                     
                     const onDragEnd = () => {
                         if (isDragging) {
                             isDragging = false;
                             line.classList.remove('dragging');
+                            // Actualizar previews inmediatamente al soltar
+                            this.updatePreviews();
                             // Guardar estado al finalizar el arrastre
                             this.saveState();
                         }
@@ -1620,14 +1679,16 @@
             }
 
             /**
-             * Actualiza las vistas previas de las partes
+             * Actualiza las vistas previas de las partes con optimización
              * Lazy rendering con IntersectionObserver para optimización
+             * Solo reconstruye DOM si el número de partes cambió
              */
             updatePreviews() {
                 if (!this.elements.thumbnailsContainer) return;
                 
                 const parts = this.getParts();
                 const numParts = (this.horizontalLines.length + 1) * (this.verticalLines.length + 1);
+                const currentThumbnails = this.elements.thumbnailsContainer.querySelectorAll('.thumbnail-item').length;
                 
                 // Actualizar contador
                 const title = this.elements.thumbnailsContainer.querySelector('h3');
@@ -1635,48 +1696,59 @@
                     title.textContent = `📊 Vista Previa (${numParts} partes)`;
                 }
                 
-                // Limpiar thumbnails
-                this.elements.thumbnailsContainer.innerHTML = '';
-                
-                // Crear thumbnails con lazy rendering
-                parts.forEach((part, index) => {
-                    const thumbnail = document.createElement('div');
-                    thumbnail.className = 'thumbnail-item';
+                // Solo reconstruir si el número de partes cambió
+                if (currentThumbnails !== numParts) {
+                    // Limpiar thumbnails
+                    this.elements.thumbnailsContainer.innerHTML = '';
                     
-                    const label = this.getPartLabel(part.row, part.col);
-                    
-                    thumbnail.innerHTML = `
-                        <canvas class="thumbnail-image" id="thumb-${this.id}-${index}"></canvas>
-                        <div class="thumbnail-info">
-                            <div class="thumbnail-label">${label}</div>
-                            <div class="thumbnail-actions">
-                                <button class="btn btn-sm btn-secondary download-part-btn" data-index="${index}">⬇️</button>
+                    // Crear thumbnails con lazy rendering
+                    parts.forEach((part, index) => {
+                        const thumbnail = document.createElement('div');
+                        thumbnail.className = 'thumbnail-item';
+                        
+                        const label = this.getPartLabel(part.row, part.col);
+                        
+                        thumbnail.innerHTML = `
+                            <canvas class="thumbnail-image" id="thumb-${this.id}-${index}"></canvas>
+                            <div class="thumbnail-info">
+                                <div class="thumbnail-label">${label}</div>
+                                <div class="thumbnail-actions">
+                                    <button class="btn btn-sm btn-secondary download-part-btn" data-index="${index}">⬇️</button>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    
-                    this.elements.thumbnailsContainer.appendChild(thumbnail);
-                    
-                    // Lazy render con IntersectionObserver
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                this.renderThumbnail(part, index);
-                                observer.unobserve(entry.target);
-                            }
-                        });
-                    }, { rootMargin: '50px' });
-                    
-                    observer.observe(thumbnail);
-                });
-                
-                // Event listeners para descargas individuales
-                this.elements.thumbnailsContainer.querySelectorAll('.download-part-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index);
-                        this.downloadPart(parts[index]);
+                        `;
+                        
+                        this.elements.thumbnailsContainer.appendChild(thumbnail);
+                        
+                        // Lazy render con IntersectionObserver
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    this.renderThumbnail(part, index);
+                                    observer.unobserve(entry.target);
+                                }
+                            });
+                        }, { rootMargin: '50px' });
+                        
+                        observer.observe(thumbnail);
                     });
-                });
+                    
+                    // Event listeners para descargas individuales
+                    this.elements.thumbnailsContainer.querySelectorAll('.download-part-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const index = parseInt(e.target.dataset.index);
+                            this.downloadPart(parts[index]);
+                        });
+                    });
+                } else {
+                    // Solo actualizar el contenido de los canvas existentes
+                    parts.forEach((part, index) => {
+                        const canvas = document.getElementById(`thumb-${this.id}-${index}`);
+                        if (canvas) {
+                            this.renderThumbnail(part, index);
+                        }
+                    });
+                }
             }
 
             /**
@@ -1754,6 +1826,13 @@
                         exactX, exactY, exactWidth, exactHeight,
                         0, 0, canvas.width, canvas.height
                     );
+                    
+                    // Añadir animación suave de actualización
+                    canvas.classList.remove('thumbnail-updating');
+                    // Forzar reflow
+                    void canvas.offsetWidth;
+                    canvas.classList.add('thumbnail-updating');
+                    
                 } catch (error) {
                     console.error('Error renderizando thumbnail:', error);
                 }
