@@ -371,11 +371,17 @@
             border-radius: var(--radius);
             overflow: hidden;
             min-height: 300px;
+            /* Área táctil aumentada para permitir touch arriba/abajo */
+            padding-top: 60px;
+            padding-bottom: 60px;
         }
 
         .preview-wrapper.pan-enabled {
             overflow: auto;
             cursor: grab;
+            /* Aumentar área táctil cuando hay zoom */
+            padding-top: 80px;
+            padding-bottom: 80px;
         }
 
         .preview-wrapper.pan-enabled:active {
@@ -472,14 +478,18 @@
             left: 50%;
             transform: translateX(-50%);
             background: var(--bg-card);
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.25rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
             z-index: 20;
             opacity: 0;
             transition: opacity 0.3s ease;
+            /* Mejorar visibilidad en móvil */
+            max-width: 90%;
+            text-align: center;
         }
 
         .pan-hint.visible {
@@ -513,7 +523,6 @@
             border-radius: var(--radius);
             overflow: hidden;
             border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
         }
 
         .thumbnail-item:hover {
@@ -798,18 +807,8 @@
         /* ========================================
            ANIMACIONES
            ======================================== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .image-section {
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .loading {
@@ -868,6 +867,19 @@
 
             .preview-wrapper {
                 min-height: 200px;
+                /* Área táctil más grande en móvil para touch arriba/abajo */
+                padding-top: 100px;
+                padding-bottom: 100px;
+            }
+
+            .preview-wrapper.pan-enabled {
+                padding-top: 120px;
+                padding-bottom: 120px;
+            }
+
+            .pan-hint {
+                font-size: 1rem;
+                padding: 1rem 1.5rem;
             }
 
             .input-sm {
@@ -1454,7 +1466,13 @@
                 let scrollLeft, scrollTop;
 
                 const startPan = (e) => {
+                    // Detectar si el touch es en el área vacía (arriba/abajo de la imagen)
+                    const target = e.target;
+                    const isCanvas = target === this.elements.canvas || target === this.elements.canvasContainer;
+                    
+                    // Siempre permitir pan cuando hay zoom, sin importar dónde se toque
                     if (!this.isZoomed) return;
+                    
                     isPanning = true;
                     startX = e.clientX || e.touches[0].clientX;
                     startY = e.clientY || e.touches[0].clientY;
@@ -1466,10 +1484,14 @@
                 const movePan = (e) => {
                     if (!isPanning) return;
                     e.preventDefault();
-                    const x = e.clientX || e.touches[0].clientX;
-                    const y = e.clientY || e.touches[0].clientY;
+                    
+                    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                    
                     const walkX = (x - startX) * 1.5;
                     const walkY = (y - startY) * 1.5;
+                    
+                    // Aplicar scroll horizontal y vertical
                     wrapper.scrollLeft = scrollLeft - walkX;
                     wrapper.scrollTop = scrollTop - walkY;
                 };
@@ -1478,10 +1500,40 @@
                     isPanning = false;
                 };
 
+                // Eventos de ratón
                 wrapper.addEventListener('mousedown', startPan);
-                wrapper.addEventListener('touchstart', startPan, { passive: false });
+                
+                // Eventos táctiles mejorados para móvil
+                wrapper.addEventListener('touchstart', (e) => {
+                    // Permitir iniciar pan en cualquier parte del wrapper cuando hay zoom
+                    if (!this.isZoomed) return;
+                    
+                    isPanning = true;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    scrollLeft = wrapper.scrollLeft;
+                    scrollTop = wrapper.scrollTop;
+                    this.elements.panHint.classList.remove('visible');
+                    
+                    // Prevenir comportamiento por defecto del navegador
+                    e.preventDefault();
+                }, { passive: false });
+                
                 document.addEventListener('mousemove', movePan);
-                document.addEventListener('touchmove', movePan, { passive: false });
+                document.addEventListener('touchmove', (e) => {
+                    if (isPanning && this.isZoomed) {
+                        e.preventDefault();
+                        const x = e.touches[0].clientX;
+                        const y = e.touches[0].clientY;
+                        
+                        const walkX = (x - startX) * 1.5;
+                        const walkY = (y - startY) * 1.5;
+                        
+                        wrapper.scrollLeft = scrollLeft - walkX;
+                        wrapper.scrollTop = scrollTop - walkY;
+                    }
+                }, { passive: false });
+                
                 document.addEventListener('mouseup', endPan);
                 document.addEventListener('touchend', endPan);
             }
@@ -1538,6 +1590,18 @@
             }
 
             initDraggableLines() {
+                // Limpiar event listeners viejos de líneas anteriores
+                if (this.elements.canvasContainer) {
+                    this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(line => {
+                        if (line._dragHandlers) {
+                            document.removeEventListener('mousemove', line._dragHandlers.onDragMove);
+                            document.removeEventListener('mouseup', line._dragHandlers.onDragEnd);
+                            document.removeEventListener('touchmove', line._dragHandlers.onDragMove);
+                            document.removeEventListener('touchend', line._dragHandlers.onDragEnd);
+                        }
+                    });
+                }
+                
                 const lines = this.elements.canvasContainer.querySelectorAll('.divider-line');
                 
                 lines.forEach(line => {
@@ -1590,6 +1654,7 @@
                             this.horizontalLines[index] = newPos;
                         }
                         
+                        // Solo actualizar posición visual, NO actualizar previews
                         if (type === 'vertical') {
                             line.style.left = `${newPos}%`;
                         } else {
@@ -1601,6 +1666,7 @@
                         if (isDragging) {
                             isDragging = false;
                             line.classList.remove('dragging');
+                            // Solo actualizar previews al soltar la línea
                             this.updatePreviews();
                             this.saveState();
                         }
@@ -1669,6 +1735,7 @@
                     title.textContent = `${t.previewTitle} (${numParts} ${t.parts})`;
                 }
                 
+                // Solo reconstruir si el número de partes cambió
                 if (currentThumbnails !== numParts) {
                     this.elements.thumbnailsContainer.innerHTML = '';
                     
@@ -1690,6 +1757,7 @@
                         
                         this.elements.thumbnailsContainer.appendChild(thumbnail);
                         
+                        // Renderizar thumbnail inmediatamente
                         this.renderThumbnail(part, index);
                     });
                     
@@ -1699,14 +1767,8 @@
                             this.downloadPart(parts[index]);
                         });
                     });
-                } else {
-                    parts.forEach((part, index) => {
-                        const canvas = document.getElementById(`thumb-${this.id}-${index}`);
-                        if (canvas) {
-                            this.renderThumbnail(part, index);
-                        }
-                    });
                 }
+                // NO actualizar canvas existentes - esto causaba el parpadeo
             }
 
             getParts() {
@@ -1744,6 +1806,9 @@
                 const canvas = document.getElementById(`thumb-${this.id}-${index}`);
                 if (!canvas) return;
                 
+                // Verificar si este canvas ya fue renderizado con esta parte
+                if (canvas._renderedWith === `${part.x}-${part.y}-${part.width}-${part.height}`) return;
+                
                 try {
                     const exactX = Math.round(part.x);
                     const exactY = Math.round(part.y);
@@ -1765,6 +1830,9 @@
                         exactX, exactY, exactWidth, exactHeight,
                         0, 0, canvas.width, canvas.height
                     );
+                    
+                    // Marcar canvas como renderizado con estas coordenadas
+                    canvas._renderedWith = `${part.x}-${part.y}-${part.width}-${part.height}`;
                     
                 } catch (error) {
                     console.error('Error renderizando thumbnail:', error);
