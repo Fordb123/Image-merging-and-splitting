@@ -390,14 +390,13 @@
 
         .preview-canvas-container {
             position: relative;
-            display: inline-block;
+            display: block;
             max-width: 100%;
         }
 
         .preview-canvas {
             display: block;
-            max-width: 100%;
-            height: auto;
+            /* Sin max-width para mantener dimensiones exactas */
             touch-action: none;
         }
 
@@ -418,22 +417,24 @@
             background: #f87171;
         }
 
-        /* Líneas verticales */
+        /* Líneas verticales - Centradas exactamente en el punto de corte */
         .divider-line.vertical {
             top: 0;
             bottom: 0;
             width: var(--line-width);
             height: 100%;
-            transform: translateX(calc(var(--line-width) * -0.5));
+            /* Transform: -50% centra horizontalmente, -1px compensa el ancho */
+            transform: translateX(calc(var(--line-width) * -0.5 - 1px));
         }
 
-        /* Líneas horizontales */
+        /* Líneas horizontales - Centradas exactamente en el punto de corte */
         .divider-line.horizontal {
             left: 0;
             right: 0;
             height: var(--line-width);
             width: 100%;
-            transform: translateY(calc(var(--line-width) * -0.5));
+            /* Transform: -50% centra verticalmente, -1px compensa el alto */
+            transform: translateY(calc(var(--line-width) * -0.5 - 1px));
         }
 
         /* Área táctil expandida */
@@ -1639,17 +1640,18 @@
                         const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                         const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                         
-                        const rect = this.elements.canvas.getBoundingClientRect();
+                        // Usar dimensiones originales del canvas, NO getBoundingClientRect() afectado por zoom
+                        // El porcentaje siempre se calcula correctamente respecto al tamaño original
                         let newPos;
                         
                         if (type === 'vertical') {
                             const deltaX = clientX - startX;
-                            const deltaPercent = (deltaX / rect.width) * 100;
+                            const deltaPercent = (deltaX / this.width) * 100;
                             newPos = Math.max(1, Math.min(99, startPos + deltaPercent));
                             this.verticalLines[index] = newPos;
                         } else {
                             const deltaY = clientY - startY;
-                            const deltaPercent = (deltaY / rect.height) * 100;
+                            const deltaPercent = (deltaY / this.height) * 100;
                             newPos = Math.max(1, Math.min(99, startPos + deltaPercent));
                             this.horizontalLines[index] = newPos;
                         }
@@ -1774,26 +1776,31 @@
             getParts() {
                 const parts = [];
                 
-                // Calcular límites exactos en píxeles con precisión 100%
-                // Usamos Math.floor para evitar errores de redondeo acumulativos
-                const vLimitsPixels = [0, ...this.verticalLines.map(p => Math.floor((p / 100) * this.width)), this.width];
-                const hLimitsPixels = [0, ...this.horizontalLines.map(p => Math.floor((p / 100) * this.height)), this.height];
+                // Mantener los porcentajes exactos como decimales para máxima precisión
+                // Solo convertir a píxeles enteros cuando se renderiza en el canvas
+                const vLimitsPercent = [0, ...this.verticalLines, 100];
+                const hLimitsPercent = [0, ...this.horizontalLines, 100];
                 
-                // Generar partes con coordenadas exactas
-                for (let row = 0; row < hLimitsPixels.length - 1; row++) {
-                    for (let col = 0; col < vLimitsPixels.length - 1; col++) {
-                        const x = vLimitsPixels[col];
-                        const y = hLimitsPixels[row];
-                        const width = vLimitsPixels[col + 1] - x;
-                        const height = hLimitsPixels[row + 1] - y;
+                // Generar partes con coordenadas como decimales (píxeles fraccionarios)
+                for (let row = 0; row < hLimitsPercent.length - 1; row++) {
+                    for (let col = 0; col < vLimitsPercent.length - 1; col++) {
+                        const xPercent = vLimitsPercent[col];
+                        const yPercent = hLimitsPercent[row];
+                        const widthPercent = vLimitsPercent[col + 1] - xPercent;
+                        const heightPercent = hLimitsPercent[row + 1] - yPercent;
                         
                         parts.push({
                             row: row + 1,
                             col: col + 1,
-                            x: x,
-                            y: y,
-                            width: width,
-                            height: height
+                            xPercent: xPercent,
+                            yPercent: yPercent,
+                            widthPercent: widthPercent,
+                            heightPercent: heightPercent,
+                            // Para dibujo: convertir a píxeles
+                            x: Math.round(xPercent / 100 * this.width),
+                            y: Math.round(yPercent / 100 * this.height),
+                            width: Math.round(widthPercent / 100 * this.width),
+                            height: Math.round(heightPercent / 100 * this.height)
                         });
                     }
                 }
@@ -2336,7 +2343,7 @@
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                     
-                    const rect = container.getBoundingClientRect();
+                    const rect = this.elements.canvas.getBoundingClientRect();
                     
                     // Capturar posición inicial del cursor
                     startX = clientX;
@@ -2357,7 +2364,7 @@
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                     
-                    const rect = container.getBoundingClientRect();
+                    const rect = this.elements.canvas.getBoundingClientRect();
                     let newPos;
                     
                     if (direction === 'horizontal') {
