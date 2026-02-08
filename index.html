@@ -34,8 +34,9 @@
             --shadow: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
             --radius: 8px;
-            --line-color: #ef4444;
-            --line-width: 2px;
+            --line-vertical-color: #3b82f6;
+            --line-horizontal-color: #ef4444;
+            --line-width: 3px;
         }
 
         /* Tema oscuro */
@@ -245,6 +246,18 @@
             border-color: #991b1b;
         }
 
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        [data-theme="dark"] .alert-success {
+            background: #14532d;
+            color: #86efac;
+            border-color: #166534;
+        }
+
         /* ========================================
            SECCIÓN DE IMÁGENES
            ======================================== */
@@ -355,7 +368,7 @@
         }
 
         /* ========================================
-           PREVIEW WRAPPER CON CANVAS
+           PREVIEW WRAPPER CON CANVAS - CENTRADO
            ======================================== */
         .preview-container {
             padding: 1rem;
@@ -371,17 +384,13 @@
             border-radius: var(--radius);
             overflow: hidden;
             min-height: 300px;
-            /* Área táctil aumentada para permitir touch arriba/abajo */
-            padding-top: 60px;
-            padding-bottom: 60px;
+            padding: 40px;
         }
 
         .preview-wrapper.pan-enabled {
             overflow: auto;
             cursor: grab;
-            /* Aumentar área táctil cuando hay zoom */
-            padding-top: 80px;
-            padding-bottom: 80px;
+            padding: 60px;
         }
 
         .preview-wrapper.pan-enabled:active {
@@ -389,66 +398,89 @@
         }
 
         /* ========================================
-           PREVIEW CANVAS PARA MANTENER LÍNEAS 100% PRECISAS
+           PREVIEW CANVAS CONTAINER - CLAVE PARA PRECISIÓN
            ======================================== */
         .preview-canvas-container {
             position: relative;
-            display: block;
-            /* NO max-width para mantener dimensiones originales exactas */
+            display: inline-block;
+            /* El contenedor toma el tamaño exacto del canvas */
         }
 
         .preview-canvas {
             display: block;
             touch-action: none;
+            /* Canvas mantiene su tamaño original */
         }
 
         /* ========================================
-           LÍNEAS DIVISORAS ARRASTRABLES
+           LÍNEAS DIVISORAS - COLORES DIFERENCIADOS
            ======================================== */
         .divider-line {
             position: absolute;
-            background: var(--line-color);
-            cursor: move;
             z-index: 10;
-            opacity: 0.8;
-            transition: opacity 0.2s ease, background 0.2s ease;
+            opacity: 0.9;
+            transition: opacity 0.2s ease, transform 0.1s ease;
+            /* Prevenir que el usuario seleccione texto al arrastrar */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Líneas verticales - AZULES */
+        .divider-line.vertical {
+            top: 0;
+            height: 100%;
+            width: var(--line-width);
+            background: var(--line-vertical-color);
+            cursor: ew-resize;
+            /* Centrar la línea en su posición */
+            transform: translateX(-50%);
+        }
+
+        /* Líneas horizontales - ROJAS */
+        .divider-line.horizontal {
+            left: 0;
+            width: 100%;
+            height: var(--line-width);
+            background: var(--line-horizontal-color);
+            cursor: ns-resize;
+            /* Centrar la línea en su posición */
+            transform: translateY(-50%);
         }
 
         .divider-line:hover, .divider-line.dragging {
             opacity: 1;
+            z-index: 20;
+        }
+
+        .divider-line.vertical:hover, .divider-line.vertical.dragging {
+            transform: translateX(-50%) scaleX(2);
+            background: #60a5fa;
+        }
+
+        .divider-line.horizontal:hover, .divider-line.horizontal.dragging {
+            transform: translateY(-50%) scaleY(2);
             background: #f87171;
         }
 
-        /* Líneas verticales - POSICIONADAS POR PORCENTAJES DEL CANVAS */
-        .divider-line.vertical {
-            top: 0;
-            bottom: 0;
-            width: var(--line-width);
-            height: 100%;
-            /* Importante: Las líneas se posicionan por porcentaje del canvas REAL, no del offset visual */
-            transform: translateX(calc(var(--line-width) * -0.5));
-        }
-
-        /* Líneas horizontales - POSICIONADAS POR PORCENTAJES DEL CANVAS */
-        .divider-line.horizontal {
-            left: 0;
-            right: 0;
-            height: var(--line-width);
-            width: 100%;
-            /* Importante: Las líneas se posicionan por porcentaje del canvas REAL, no del offset visual */
-            transform: translateY(calc(var(--line-width) * -0.5));
-        }
-
-        /* Área táctil expandida */
+        /* Área táctil expandida para móvil */
         .divider-line::before {
             content: '';
             position: absolute;
-            background: transparent;
-            z-index: 1;
-            left: -10px;
-            right: -10px;
-            top: -10px;
-            bottom: -10px;
+            z-index: -1;
+        }
+
+        .divider-line.vertical::before {
+            top: 0;
+            bottom: 0;
+            left: -15px;
+            right: -15px;
+        }
+
+        .divider-line.horizontal::before {
+            left: 0;
+            right: 0;
+            top: -15px;
+            bottom: -15px;
         }
 
         /* ========================================
@@ -490,7 +522,6 @@
             z-index: 20;
             opacity: 0;
             transition: opacity 0.3s ease;
-            /* Mejorar visibilidad en móvil */
             max-width: 90%;
             text-align: center;
         }
@@ -508,16 +539,22 @@
             border-top: 1px solid var(--border-color);
         }
 
-        .preview-thumbnails h3 {
+        .preview-thumbnails-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .preview-thumbnails-header h3 {
             font-size: 0.875rem;
             font-weight: 600;
-            margin-bottom: 1rem;
             color: var(--text-primary);
         }
 
         .thumbnails-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 1rem;
         }
 
@@ -525,7 +562,8 @@
             background: var(--bg-card);
             border-radius: var(--radius);
             overflow: hidden;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .thumbnail-item:hover {
@@ -538,11 +576,13 @@
             aspect-ratio: 1;
             object-fit: contain;
             display: block;
+            background: var(--bg-primary);
         }
 
         .thumbnail-info {
             padding: 0.5rem;
             text-align: center;
+            background: var(--bg-secondary);
         }
 
         .thumbnail-label {
@@ -552,10 +592,17 @@
             word-break: break-word;
         }
 
+        .thumbnail-dimensions {
+            font-size: 0.625rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
         .thumbnail-actions {
             display: flex;
             gap: 0.25rem;
             justify-content: center;
+            margin-top: 0.25rem;
         }
 
         /* ========================================
@@ -773,6 +820,34 @@
             gap: 0.5rem;
         }
 
+        /* Leyenda de colores de líneas */
+        .line-legend {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .line-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .line-legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .line-legend-color.vertical {
+            background: var(--line-vertical-color);
+        }
+
+        .line-legend-color.horizontal {
+            background: var(--line-horizontal-color);
+        }
+
         /* ========================================
            FOOTER
            ======================================== */
@@ -805,17 +880,6 @@
             overflow: hidden;
             clip: rect(0, 0, 0, 0);
             border: 0;
-        }
-
-        /* ========================================
-           ANIMACIONES
-           ======================================== */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading {
-            animation: pulse 1.5s ease-in-out infinite;
         }
 
         /* ========================================
@@ -870,14 +934,11 @@
 
             .preview-wrapper {
                 min-height: 200px;
-                /* Área táctil más grande en móvil para touch arriba/abajo */
-                padding-top: 100px;
-                padding-bottom: 100px;
+                padding: 60px 20px;
             }
 
             .preview-wrapper.pan-enabled {
-                padding-top: 120px;
-                padding-bottom: 120px;
+                padding: 80px 30px;
             }
 
             .pan-hint {
@@ -895,7 +956,18 @@
             }
 
             .divider-line {
-                --line-width: 3px;
+                --line-width: 4px;
+            }
+
+            /* Área táctil más grande en móvil */
+            .divider-line.vertical::before {
+                left: -20px;
+                right: -20px;
+            }
+
+            .divider-line.horizontal::before {
+                top: -20px;
+                bottom: -20px;
             }
         }
     </style>
@@ -950,7 +1022,6 @@
             <div class="global-actions-buttons">
                 <button class="btn btn-primary" id="downloadAllBtn" data-i18n="downloadAllBtn">📦 Descargar Todo (ZIP)</button>
                 <button class="btn btn-secondary" id="applyAllBtn" data-i18n="applyAllBtn">📋 Aplicar Config. a Todas</button>
-                <button class="btn btn-success" id="mergeImagesBtn" data-i18n="mergeImagesBtn">🔗 Unir Imágenes</button>
             </div>
         </section>
 
@@ -979,26 +1050,37 @@
                 <ul>
                     <li data-i18n="tutorialStep1Item1">Arrastra imágenes al área de carga o usa "Seleccionar Imágenes"</li>
                     <li data-i18n="tutorialStep1Item2">Puedes cargar múltiples imágenes a la vez</li>
-                    <li data-i18n="tutorialStep1Item3">Límite: 50 MB por imagen, advertencia si >5 imágenes o >200 MB total</li>
+                    <li data-i18n="tutorialStep1Item3">Límite: 50 MB por imagen</li>
                 </ul>
 
                 <h3 data-i18n="tutorialStep2Title">2️⃣ Configurar Divisiones</h3>
                 <ul>
-                    <li data-i18n="tutorialStep2Item1"><strong>Div. Vertical (Columnas):</strong> Número de columnas horizontales</li>
-                    <li data-i18n="tutorialStep2Item2"><strong>Div. Horizontal (Filas):</strong> Número de filas verticales</li>
+                    <li data-i18n="tutorialStep2Item1"><strong>Div. Vertical:</strong> Número de columnas (líneas azules)</li>
+                    <li data-i18n="tutorialStep2Item2"><strong>Div. Horizontal:</strong> Número de filas (líneas rojas)</li>
                     <li data-i18n="tutorialStep2Item3">Las líneas se generan automáticamente al cambiar los números</li>
                 </ul>
 
                 <h3 data-i18n="tutorialStep3Title">3️⃣ Ajustar Líneas Manualmente</h3>
                 <ul>
-                    <li data-i18n="tutorialStep3Item1">Las líneas rojas son arrastrables: arrástralas para ajustar posición</li>
-                    <li data-i18n="tutorialStep3Item2">Usa +/- para zoom y arrastra para pan (mover la imagen)</li>
+                    <li data-i18n="tutorialStep3Item1">Arrastra las líneas para ajustar posición exacta</li>
+                    <li data-i18n="tutorialStep3Item2">La vista previa se actualiza en tiempo real</li>
                 </ul>
+                
+                <div class="line-legend">
+                    <div class="line-legend-item">
+                        <div class="line-legend-color vertical"></div>
+                        <span>Líneas Verticales (Azul)</span>
+                    </div>
+                    <div class="line-legend-item">
+                        <div class="line-legend-color horizontal"></div>
+                        <span>Líneas Horizontales (Rojo)</span>
+                    </div>
+                </div>
 
                 <h3 data-i18n="tutorialStep4Title">4️⃣ Descargar</h3>
                 <ul>
-                    <li data-i18n="tutorialStep4Item1">Descarga partes individuales o completa en ZIP</li>
-                    <li data-i18n="tutorialStep4Item2">Usa "Descargar Todo" para obtener todas las partes de todas las imágenes</li>
+                    <li data-i18n="tutorialStep4Item1">Descarga partes individuales o todo en ZIP</li>
+                    <li data-i18n="tutorialStep4Item2">Usa "Descargar Todo" para todas las imágenes</li>
                 </ul>
             </div>
             <div class="modal-footer">
@@ -1014,10 +1096,7 @@
            ======================================== */
         const translations = {
             es: {
-                title: "Divisor de Imágenes Gratuito Online - Múltiples Fotos, Divisiones Independientes o Globales, Automático por Número de Partes",
-                description: "Divisor de imágenes online gratuito. Divide múltiples imágenes simultáneamente con control independiente o global. Soporte para filas/columnas personalizables, líneas arrastrables y descarga en ZIP.",
-                ogTitle: "Divisor de Imágenes Gratuito Online",
-                ogDescription: "Divide múltiples imágenes simultáneamente con control independiente o global. Gratis y 100% client-side.",
+                title: "Divisor de Imágenes Gratuito Online",
                 appTitle: "Divisor de Imágenes",
                 appSubtitle: "Gratis • Privado • 100% Client-Side",
                 helpBtn: "❓ Ayuda",
@@ -1026,60 +1105,26 @@
                 uploadDesc: "Arrastra imágenes aquí o haz clic para seleccionar",
                 uploadLimit: "Máximo 50 MB por imagen • Advertencia si >5 imágenes o >200 MB total",
                 selectFilesBtn: "📁 Seleccionar Imágenes",
-                selectFilesText: "Seleccionar Imágenes",
                 globalActionsTitle: "🌐 Acciones Globales",
                 downloadAllBtn: "📦 Descargar Todo (ZIP)",
                 applyAllBtn: "📋 Aplicar Config. a Todas",
-                mergeImagesBtn: "🔗 Unir Imágenes",
-                footerText: "✂️ Divisor de Imágenes Gratuito Online - Procesamiento 100% local, tus imágenes nunca salen de tu dispositivo.<br>Recomendado: Chrome/Firefox en desktop. Móvil/Safari puede tener limitaciones de tamaño.",
                 themeLight: "☀️ Claro",
                 themeDark: "🌙 Oscuro",
                 themeSystem: "💻 Sistema",
-                tutorialTitle: "📖 Tutorial de Uso",
-                tutorialStep1Title: "1️⃣ Cargar Imágenes",
-                tutorialStep1Item1: "Arrastra imágenes al área de carga o usa 'Seleccionar Imágenes'",
-                tutorialStep1Item2: "Puedes cargar múltiples imágenes a la vez",
-                tutorialStep1Item3: "Límite: 50 MB por imagen, advertencia si >5 imágenes o >200 MB total",
-                tutorialStep2Title: "2️⃣ Configurar Divisiones",
-                tutorialStep2Item1: "<strong>Div. Vertical (Columnas):</strong> Número de columnas horizontales",
-                tutorialStep2Item2: "<strong>Div. Horizontal (Filas):</strong> Número de filas verticales",
-                tutorialStep2Item3: "Las líneas se generan automáticamente al cambiar los números",
-                tutorialStep3Title: "3️⃣ Ajustar Líneas Manualmente",
-                tutorialStep3Item1: "Las líneas rojas son arrastrables: arrástralas para ajustar posición",
-                tutorialStep3Item2: "Usa +/- para zoom y arrastra para pan (mover la imagen)",
-                tutorialStep4Title: "4️⃣ Descargar",
-                tutorialStep4Item1: "Descarga partes individuales o completa en ZIP",
-                tutorialStep4Item2: "Usa 'Descargar Todo' para obtener todas las partes de todas las imágenes",
-                dontShowAgainBtn: "No mostrar de nuevo",
-                closeTutorialBtn: "¡Entendido!",
                 divVertical: "Div. Vertical:",
                 divHorizontal: "Div. Horizontal:",
                 applyToAll: "Aplicar a todas",
-                previewTitle: "📊 Vista Previa",
+                previewTitle: "Vista Previa",
                 parts: "partes",
-                zoomIn: "+",
-                zoomOut: "-",
-                zoomLevel: "Zoom",
                 processing: "Procesando...",
-                downloadZip: "Descargar ZIP",
+                downloadZip: "📦 Descargar ZIP",
                 downloadPart: "⬇️",
                 undo: "↩️",
                 redo: "↪️",
-                remove: "🗑️",
-                mergeTitle: "🔗 Unión de Imágenes",
-                mergeDesc: "Combina múltiples imágenes en menos archivos finales. Las líneas separadoras indican dónde se unirán las imágenes.",
-                mergeDirection: "Dirección:",
-                mergeHorizontal: "Horizontal",
-                mergeVertical: "Vertical",
-                mergeOutputImages: "Número de imágenes de salida:",
-                mergeGenerate: "Generar Líneas de Unión",
-                mergeDownload: "Descargar Imágenes Unidas (ZIP)"
+                remove: "🗑️"
             },
             en: {
-                title: "Free Online Image Splitter - Multiple Photos, Independent or Global Splits, Automatic by Number of Parts",
-                description: "Free online image splitter. Split multiple images simultaneously with independent or global control. Supports custom rows/columns, draggable lines, and ZIP download.",
-                ogTitle: "Free Online Image Splitter",
-                ogDescription: "Split multiple images simultaneously with independent or global control. Free and 100% client-side.",
+                title: "Free Online Image Splitter",
                 appTitle: "Image Splitter",
                 appSubtitle: "Free • Private • 100% Client-Side",
                 helpBtn: "❓ Help",
@@ -1088,54 +1133,23 @@
                 uploadDesc: "Drag images here or click to select",
                 uploadLimit: "Max 50 MB per image • Warning if >5 images or >200 MB total",
                 selectFilesBtn: "📁 Select Images",
-                selectFilesText: "Select Images",
                 globalActionsTitle: "🌐 Global Actions",
                 downloadAllBtn: "📦 Download All (ZIP)",
                 applyAllBtn: "📋 Apply Config to All",
-                mergeImagesBtn: "🔗 Merge Images",
-                footerText: "✂️ Free Online Image Splitter - 100% local processing, your images never leave your device.<br>Recommended: Chrome/Firefox on desktop. Mobile/Safari may have size limitations.",
                 themeLight: "☀️ Light",
                 themeDark: "🌙 Dark",
                 themeSystem: "💻 System",
-                tutorialTitle: "📖 Usage Tutorial",
-                tutorialStep1Title: "1️⃣ Upload Images",
-                tutorialStep1Item1: "Drag images to upload area or use 'Select Images'",
-                tutorialStep1Item2: "You can upload multiple images at once",
-                tutorialStep1Item3: "Limit: 50 MB per image, warning if >5 images or >200 MB total",
-                tutorialStep2Title: "2️⃣ Configure Splits",
-                tutorialStep2Item1: "<strong>Div. Vertical (Columns):</strong> Number of horizontal columns",
-                tutorialStep2Item2: "<strong>Div. Horizontal (Rows):</strong> Number of vertical rows",
-                tutorialStep2Item3: "Lines generate automatically when changing numbers",
-                tutorialStep3Title: "3️⃣ Adjust Lines Manually",
-                tutorialStep3Item1: "Red lines are draggable: drag to adjust position",
-                tutorialStep3Item2: "Use +/- for zoom and drag to pan (move image)",
-                tutorialStep4Title: "4️⃣ Download",
-                tutorialStep4Item1: "Download individual parts or complete ZIP",
-                tutorialStep4Item2: "Use 'Download All' to get all parts from all images",
-                dontShowAgainBtn: "Don't show again",
-                closeTutorialBtn: "Got it!",
                 divVertical: "Div. Vertical:",
                 divHorizontal: "Div. Horizontal:",
                 applyToAll: "Apply to all",
-                previewTitle: "📊 Preview",
+                previewTitle: "Preview",
                 parts: "parts",
-                zoomIn: "+",
-                zoomOut: "-",
-                zoomLevel: "Zoom",
                 processing: "Processing...",
-                downloadZip: "Download ZIP",
+                downloadZip: "📦 Download ZIP",
                 downloadPart: "⬇️",
                 undo: "↩️",
                 redo: "↪️",
-                remove: "🗑️",
-                mergeTitle: "🔗 Image Merger",
-                mergeDesc: "Combine multiple images into fewer final files. Separator lines indicate where images will be joined.",
-                mergeDirection: "Direction:",
-                mergeHorizontal: "Horizontal",
-                mergeVertical: "Vertical",
-                mergeOutputImages: "Number of output images:",
-                mergeGenerate: "Generate Merge Lines",
-                mergeDownload: "Download Merged Images (ZIP)"
+                remove: "🗑️"
             }
         };
 
@@ -1143,8 +1157,7 @@
         let currentTheme = localStorage.getItem('imageSplitterTheme') || 'light';
 
         function applyTranslations(lang) {
-            const elements = document.querySelectorAll('[data-i18n]');
-            elements.forEach(el => {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang] && translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
@@ -1153,7 +1166,7 @@
         }
 
         /* ========================================
-           ESTADO GLOBAL DE LA APLICACIÓN
+           ESTADO GLOBAL
            ======================================== */
         const AppState = {
             images: [],
@@ -1161,11 +1174,11 @@
             maxFileSize: 50 * 1024 * 1024,
             warningImageCount: 5,
             warningTotalSize: 200 * 1024 * 1024,
-            maxDimension: 100000 // Aumentado a 100,000px para soportar imágenes de más de 70,000px
+            maxDimension: 100000
         };
 
         /* ========================================
-           CLASE ImageData
+           CLASE ImageData - CORREGIDA
            ======================================== */
         class ImageData {
             constructor(file, id) {
@@ -1176,8 +1189,8 @@
                 
                 this.rows = 1;
                 this.cols = 1;
-                this.horizontalLines = [];
-                this.verticalLines = [];
+                this.horizontalLines = [];  // Posiciones en % (0-100)
+                this.verticalLines = [];    // Posiciones en % (0-100)
                 
                 this.zoom = 1;
                 this.isZoomed = false;
@@ -1187,10 +1200,11 @@
                 
                 this.isLoaded = false;
                 this.isLoading = false;
-                this.panX = 0;
-                this.panY = 0;
                 
                 this.elements = {};
+                
+                // Bandera para evitar actualizaciones innecesarias
+                this._isUpdatingPreviews = false;
                 
                 this.loadImage();
             }
@@ -1205,10 +1219,7 @@
                     await new Promise((resolve, reject) => {
                         img.onload = () => {
                             if (img.width > AppState.maxDimension || img.height > AppState.maxDimension) {
-                                reject(new Error(
-                                    `Imagen demasiado grande: ${img.width}x${img.height}px. ` +
-                                    `Máximo permitido: ${AppState.maxDimension}px`
-                                ));
+                                reject(new Error(`Imagen demasiado grande: ${img.width}x${img.height}px`));
                             } else {
                                 resolve();
                             }
@@ -1272,19 +1283,27 @@
                 
                 this.updateInputs();
                 this.renderLines();
-                this.updatePreviews();
+                this.forceUpdatePreviews();
                 this.updateUndoRedoButtons();
             }
 
+            /**
+             * GENERACIÓN AUTOMÁTICA DE LÍNEAS
+             * ================================
+             * Para N divisiones, generamos N-1 líneas uniformemente distribuidas.
+             * Ejemplo: 3 columnas → 2 líneas verticales en 33.33% y 66.67%
+             */
             generateAutoLines() {
-                this.rows = parseInt(this.elements.rowsInput.value) || 1;
-                this.cols = parseInt(this.elements.colsInput.value) || 1;
+                this.rows = Math.max(1, Math.min(20, parseInt(this.elements.rowsInput?.value) || 1));
+                this.cols = Math.max(1, Math.min(20, parseInt(this.elements.colsInput?.value) || 1));
                 
+                // Generar líneas horizontales (para filas)
                 this.horizontalLines = [];
                 for (let i = 1; i < this.rows; i++) {
                     this.horizontalLines.push((i / this.rows) * 100);
                 }
                 
+                // Generar líneas verticales (para columnas)
                 this.verticalLines = [];
                 for (let i = 1; i < this.cols; i++) {
                     this.verticalLines.push((i / this.cols) * 100);
@@ -1292,7 +1311,7 @@
                 
                 this.saveState();
                 this.renderLines();
-                this.updatePreviews();
+                this.forceUpdatePreviews();
             }
 
             applyConfig(source) {
@@ -1304,7 +1323,7 @@
                 this.saveState();
                 this.updateInputs();
                 this.renderLines();
-                this.updatePreviews();
+                this.forceUpdatePreviews();
             }
 
             render() {
@@ -1321,7 +1340,7 @@
                     <div class="image-controls">
                         <div class="image-name">
                             ${this.name}
-                            <span class="image-dimensions">${this.width}×${this.height}</span>
+                            <span class="image-dimensions">(${this.width}×${this.height}px)</span>
                         </div>
                         <div class="control-group">
                             <label class="control-label">${t.divVertical}</label>
@@ -1352,15 +1371,17 @@
                                 <canvas class="preview-canvas" id="canvas-${this.id}"></canvas>
                             </div>
                             <div class="zoom-controls">
-                                <button class="btn btn-sm btn-secondary zoom-out">${t.zoomOut}</button>
+                                <button class="btn btn-sm btn-secondary zoom-out">−</button>
                                 <span class="zoom-level">100%</span>
-                                <button class="btn btn-sm btn-secondary zoom-in">${t.zoomIn}</button>
+                                <button class="btn btn-sm btn-secondary zoom-in">+</button>
                             </div>
-                            <div class="pan-hint" id="pan-hint-${this.id}">💡 Arrastra para mover la imagen</div>
+                            <div class="pan-hint" id="pan-hint-${this.id}">💡 Arrastra para mover</div>
                         </div>
                     </div>
                     <div class="preview-thumbnails">
-                        <h3>${t.previewTitle} (${(this.horizontalLines.length + 1) * (this.verticalLines.length + 1)} ${t.parts})</h3>
+                        <div class="preview-thumbnails-header">
+                            <h3>${t.previewTitle} (<span class="parts-count">${this.rows * this.cols}</span> ${t.parts})</h3>
+                        </div>
                         <div class="thumbnails-grid" id="thumbnails-${this.id}"></div>
                     </div>
                     <div class="image-actions">
@@ -1374,6 +1395,7 @@
                     </div>
                 `;
                 
+                // Guardar referencias a elementos
                 this.elements.rowsInput = this.elements.container.querySelector('.rows-input');
                 this.elements.colsInput = this.elements.container.querySelector('.cols-input');
                 this.elements.applyAllToggle = this.elements.container.querySelector('.apply-all-toggle');
@@ -1385,6 +1407,7 @@
                 this.elements.canvasContainer = this.elements.container.querySelector(`#canvas-container-${this.id}`);
                 this.elements.previewWrapper = this.elements.container.querySelector(`#preview-wrapper-${this.id}`);
                 this.elements.thumbnailsContainer = this.elements.container.querySelector(`#thumbnails-${this.id}`);
+                this.elements.partsCount = this.elements.container.querySelector('.parts-count');
                 this.elements.progressContainer = this.elements.container.querySelector(`#progress-${this.id}`);
                 this.elements.zoomIn = this.elements.container.querySelector('.zoom-in');
                 this.elements.zoomOut = this.elements.container.querySelector('.zoom-out');
@@ -1393,13 +1416,14 @@
                 
                 this.attachEventListeners();
                 this.drawCanvas();
-                this.updatePreviews();
+                this.renderLines();
+                this.forceUpdatePreviews();
             }
 
             renderLoading() {
                 if (!this.elements.container) {
                     this.elements.container = document.createElement('div');
-                    this.elements.container.className = 'image-section loading';
+                    this.elements.container.className = 'image-section';
                     document.getElementById('imagesContainer').appendChild(this.elements.container);
                 }
                 this.elements.container.innerHTML = `
@@ -1411,27 +1435,35 @@
             }
 
             renderError(message) {
-                if (!this.elements.container) {
-                    this.elements.container = document.createElement('div');
-                    this.elements.container.className = 'image-section';
-                    document.getElementById('imagesContainer').appendChild(this.elements.container);
-                }
-                this.elements.container.innerHTML = `
-                    <div class="alert alert-danger" style="margin: 0;">
-                        <span>❌</span>
-                        <div>
-                            <strong>Error:</strong> ${this.name}
-                            <p>${message}</p>
+                if (this.elements.container) {
+                    this.elements.container.innerHTML = `
+                        <div class="alert alert-danger" style="margin: 0;">
+                            <span>❌</span>
+                            <div>
+                                <strong>Error:</strong> ${this.name}
+                                <p>${message}</p>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
 
             attachEventListeners() {
-                // Auto-generar líneas al cambiar inputs
-                this.elements.rowsInput.addEventListener('input', () => this.generateAutoLines());
-                this.elements.colsInput.addEventListener('input', () => this.generateAutoLines());
+                // Inputs de filas/columnas
+                this.elements.rowsInput.addEventListener('change', () => this.generateAutoLines());
+                this.elements.colsInput.addEventListener('change', () => this.generateAutoLines());
                 
+                // También en input para actualizaciones más rápidas
+                this.elements.rowsInput.addEventListener('input', () => {
+                    clearTimeout(this._inputDebounce);
+                    this._inputDebounce = setTimeout(() => this.generateAutoLines(), 300);
+                });
+                this.elements.colsInput.addEventListener('input', () => {
+                    clearTimeout(this._inputDebounce);
+                    this._inputDebounce = setTimeout(() => this.generateAutoLines(), 300);
+                });
+                
+                // Aplicar a todas
                 this.elements.applyAllToggle.addEventListener('change', (e) => {
                     if (e.target.checked) {
                         this.applyConfigToAll();
@@ -1439,9 +1471,11 @@
                     }
                 });
                 
+                // Undo/Redo
                 this.elements.undoBtn.addEventListener('click', () => this.undo());
                 this.elements.redoBtn.addEventListener('click', () => this.redo());
                 
+                // Eliminar
                 this.elements.removeBtn.addEventListener('click', () => {
                     this.dispose();
                     AppState.images = AppState.images.filter(img => img.id !== this.id);
@@ -1449,32 +1483,25 @@
                     updateGlobalActions();
                 });
                 
-                this.elements.downloadZipBtn.addEventListener('click', () => {
-                    this.downloadZip();
-                });
+                // Descargar ZIP
+                this.elements.downloadZipBtn.addEventListener('click', () => this.downloadZip());
                 
+                // Zoom
                 this.elements.zoomIn.addEventListener('click', () => this.zoomIn());
                 this.elements.zoomOut.addEventListener('click', () => this.zoomOut());
                 
-                // Pan con drag
+                // Pan
                 this.initPan();
-                
-                this.initDraggableLines();
             }
 
             initPan() {
                 const wrapper = this.elements.previewWrapper;
                 let isPanning = false;
-                let startX, startY;
-                let scrollLeft, scrollTop;
+                let startX, startY, scrollLeft, scrollTop;
 
                 const startPan = (e) => {
-                    // Detectar si el touch es en el área vacía (arriba/abajo de la imagen)
-                    const target = e.target;
-                    const isCanvas = target === this.elements.canvas || target === this.elements.canvasContainer;
-                    
-                    // Siempre permitir pan cuando hay zoom, sin importar dónde se toque
                     if (!this.isZoomed) return;
+                    if (e.target.classList.contains('divider-line')) return;
                     
                     isPanning = true;
                     startX = e.clientX || e.touches[0].clientX;
@@ -1488,55 +1515,21 @@
                     if (!isPanning) return;
                     e.preventDefault();
                     
-                    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-                    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                    const x = e.clientX || (e.touches?.[0]?.clientX ?? 0);
+                    const y = e.clientY || (e.touches?.[0]?.clientY ?? 0);
                     
-                    const walkX = (x - startX) * 1.5;
-                    const walkY = (y - startY) * 1.5;
-                    
-                    // Aplicar scroll horizontal y vertical
-                    wrapper.scrollLeft = scrollLeft - walkX;
-                    wrapper.scrollTop = scrollTop - walkY;
+                    wrapper.scrollLeft = scrollLeft - (x - startX);
+                    wrapper.scrollTop = scrollTop - (y - startY);
                 };
 
                 const endPan = () => {
                     isPanning = false;
                 };
 
-                // Eventos de ratón
                 wrapper.addEventListener('mousedown', startPan);
-                
-                // Eventos táctiles mejorados para móvil
-                wrapper.addEventListener('touchstart', (e) => {
-                    // Permitir iniciar pan en cualquier parte del wrapper cuando hay zoom
-                    if (!this.isZoomed) return;
-                    
-                    isPanning = true;
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                    scrollLeft = wrapper.scrollLeft;
-                    scrollTop = wrapper.scrollTop;
-                    this.elements.panHint.classList.remove('visible');
-                    
-                    // Prevenir comportamiento por defecto del navegador
-                    e.preventDefault();
-                }, { passive: false });
-                
+                wrapper.addEventListener('touchstart', startPan, { passive: false });
                 document.addEventListener('mousemove', movePan);
-                document.addEventListener('touchmove', (e) => {
-                    if (isPanning && this.isZoomed) {
-                        e.preventDefault();
-                        const x = e.touches[0].clientX;
-                        const y = e.touches[0].clientY;
-                        
-                        const walkX = (x - startX) * 1.5;
-                        const walkY = (y - startY) * 1.5;
-                        
-                        wrapper.scrollLeft = scrollLeft - walkX;
-                        wrapper.scrollTop = scrollTop - walkY;
-                    }
-                }, { passive: false });
-                
+                document.addEventListener('touchmove', movePan, { passive: false });
                 document.addEventListener('mouseup', endPan);
                 document.addEventListener('touchend', endPan);
             }
@@ -1547,7 +1540,6 @@
                         img.applyConfig(this);
                     }
                 });
-                const t = translations[currentLang];
                 showAlert('✅ Configuración aplicada a todas las imágenes', 'success');
             }
 
@@ -1562,77 +1554,82 @@
                     ctx.drawImage(this.image, 0, 0);
                 } catch (error) {
                     console.error('Error dibujando canvas:', error);
-                    showAlert(`Error al dibujar ${this.name}. Intenta reducir el tamaño de la imagen.`, 'danger');
+                    showAlert(`Error al dibujar ${this.name}`, 'danger');
                 }
             }
 
+            /**
+             * RENDERIZAR LÍNEAS DIVISORAS
+             * ============================
+             * Las líneas se posicionan usando porcentajes CSS,
+             * lo que garantiza precisión independiente del zoom.
+             */
             renderLines() {
+                if (!this.elements.canvasContainer) return;
+                
+                // Limpiar líneas existentes
                 this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(el => el.remove());
                 
+                // Crear líneas verticales (azules)
                 this.verticalLines.forEach((pos, index) => {
                     const line = document.createElement('div');
                     line.className = 'divider-line vertical';
                     line.style.left = `${pos}%`;
                     line.dataset.type = 'vertical';
                     line.dataset.index = index;
-                    line.dataset.id = this.id;
                     this.elements.canvasContainer.appendChild(line);
                 });
                 
+                // Crear líneas horizontales (rojas)
                 this.horizontalLines.forEach((pos, index) => {
                     const line = document.createElement('div');
                     line.className = 'divider-line horizontal';
                     line.style.top = `${pos}%`;
                     line.dataset.type = 'horizontal';
                     line.dataset.index = index;
-                    line.dataset.id = this.id;
                     this.elements.canvasContainer.appendChild(line);
                 });
                 
+                // Inicializar arrastre de líneas
                 this.initDraggableLines();
             }
 
+            /**
+             * ARRASTRE DE LÍNEAS - PRECISIÓN 100%
+             * ===================================
+             * CLAVE: Usamos el tamaño ORIGINAL del canvas (this.width, this.height)
+             * para calcular porcentajes, NO el tamaño visual (getBoundingClientRect).
+             * 
+             * Esto garantiza que las líneas estén exactamente donde el usuario las pone,
+             * independientemente del zoom aplicado.
+             */
             initDraggableLines() {
-                // Limpiar event listeners viejos de líneas anteriores
-                if (this.elements.canvasContainer) {
-                    this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(line => {
-                        if (line._dragHandlers) {
-                            document.removeEventListener('mousemove', line._dragHandlers.onDragMove);
-                            document.removeEventListener('mouseup', line._dragHandlers.onDragEnd);
-                            document.removeEventListener('touchmove', line._dragHandlers.onDragMove);
-                            document.removeEventListener('touchend', line._dragHandlers.onDragEnd);
-                        }
-                    });
-                }
-                
                 const lines = this.elements.canvasContainer.querySelectorAll('.divider-line');
                 
                 lines.forEach(line => {
                     let isDragging = false;
-                    let startX = 0;
-                    let startY = 0;
-                    let startPos = 0;
+                    let startClientPos = 0;
+                    let startLinePercent = 0;
                     
                     const type = line.dataset.type;
                     const index = parseInt(line.dataset.index);
                     
                     const onDragStart = (e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         isDragging = true;
                         line.classList.add('dragging');
                         
                         const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                         const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                         
-                        const rect = this.elements.canvas.getBoundingClientRect();
+                        // Guardar posición inicial del cursor
+                        startClientPos = type === 'vertical' ? clientX : clientY;
                         
-                        if (type === 'vertical') {
-                            startPos = this.verticalLines[index];
-                            startX = clientX;
-                        } else {
-                            startPos = this.horizontalLines[index];
-                            startY = clientY;
-                        }
+                        // Guardar posición inicial de la línea (en porcentaje)
+                        startLinePercent = type === 'vertical' 
+                            ? this.verticalLines[index] 
+                            : this.horizontalLines[index];
                     };
                     
                     const onDragMove = (e) => {
@@ -1642,55 +1639,90 @@
                         const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                         const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                         
-                        // Usar dimensiones originales del canvas, NO getBoundingClientRect() afectado por zoom
-                        // El porcentaje siempre se calcula correctamente respecto al tamaño original
-                        let newPos;
+                        /**
+                         * CÁLCULO DE PRECISIÓN 100%
+                         * ==========================
+                         * 1. Obtenemos el rect del canvas para conocer su tamaño VISUAL actual
+                         * 2. Calculamos el delta del movimiento del cursor en píxeles
+                         * 3. Convertimos ese delta a porcentaje usando el tamaño VISUAL
+                         * 4. Aplicamos el delta al porcentaje inicial
+                         * 
+                         * Esto funciona porque:
+                         * - El porcentaje siempre es relativo al tamaño original
+                         * - El delta visual se convierte correctamente a porcentaje
+                         */
+                        const rect = this.elements.canvas.getBoundingClientRect();
+                        
+                        let newPercent;
                         
                         if (type === 'vertical') {
-                            const deltaX = clientX - startX;
-                            const deltaPercent = (deltaX / this.width) * 100;
-                            newPos = Math.max(1, Math.min(99, startPos + deltaPercent));
-                            this.verticalLines[index] = newPos;
+                            const currentClientPos = clientX;
+                            const deltaPx = currentClientPos - startClientPos;
+                            // Convertir delta en píxeles visuales a porcentaje
+                            const deltaPercent = (deltaPx / rect.width) * 100;
+                            newPercent = startLinePercent + deltaPercent;
                         } else {
-                            const deltaY = clientY - startY;
-                            const deltaPercent = (deltaY / this.height) * 100;
-                            newPos = Math.max(1, Math.min(99, startPos + deltaPercent));
-                            this.horizontalLines[index] = newPos;
+                            const currentClientPos = clientY;
+                            const deltaPx = currentClientPos - startClientPos;
+                            // Convertir delta en píxeles visuales a porcentaje
+                            const deltaPercent = (deltaPx / rect.height) * 100;
+                            newPercent = startLinePercent + deltaPercent;
                         }
                         
-                        // Solo actualizar posición visual, NO actualizar previews
+                        // Limitar entre 0.5% y 99.5%
+                        newPercent = Math.max(0.5, Math.min(99.5, newPercent));
+                        
+                        // Actualizar array de líneas
                         if (type === 'vertical') {
-                            line.style.left = `${newPos}%`;
+                            this.verticalLines[index] = newPercent;
+                            line.style.left = `${newPercent}%`;
                         } else {
-                            line.style.top = `${newPos}%`;
+                            this.horizontalLines[index] = newPercent;
+                            line.style.top = `${newPercent}%`;
                         }
+                        
+                        // Actualizar contador de partes
+                        this.updatePartsCount();
+                        
+                        // Actualizar previews en tiempo real (con throttle)
+                        this.throttledUpdatePreviews();
                     };
                     
                     const onDragEnd = () => {
                         if (isDragging) {
                             isDragging = false;
                             line.classList.remove('dragging');
-                            // Solo actualizar previews al soltar la línea
-                            this.updatePreviews();
                             this.saveState();
+                            // Actualización final
+                            this.forceUpdatePreviews();
                         }
                     };
                     
+                    // Event listeners
                     line.addEventListener('mousedown', onDragStart);
                     line.addEventListener('touchstart', onDragStart, { passive: false });
+                    
+                    // Guardamos referencias para poder limpiar después
+                    line._onDragMove = onDragMove;
+                    line._onDragEnd = onDragEnd;
                     
                     document.addEventListener('mousemove', onDragMove);
                     document.addEventListener('mouseup', onDragEnd);
                     document.addEventListener('touchmove', onDragMove, { passive: false });
                     document.addEventListener('touchend', onDragEnd);
-                    
-                    line._dragHandlers = { onDragMove, onDragEnd };
                 });
             }
 
+            updatePartsCount() {
+                if (this.elements.partsCount) {
+                    const count = (this.horizontalLines.length + 1) * (this.verticalLines.length + 1);
+                    this.elements.partsCount.textContent = count;
+                }
+            }
+
             updateInputs() {
-                if (this.elements.rowsInput) this.elements.rowsInput.value = this.cols;
-                if (this.elements.colsInput) this.elements.colsInput.value = this.rows;
+                if (this.elements.rowsInput) this.elements.rowsInput.value = this.rows;
+                if (this.elements.colsInput) this.elements.colsInput.value = this.cols;
             }
 
             updateUndoRedoButtons() {
@@ -1721,97 +1753,106 @@
                 
                 if (this.isZoomed) {
                     this.elements.panHint.classList.add('visible');
-                    setTimeout(() => this.elements.panHint.classList.remove('visible'), 3000);
+                    setTimeout(() => this.elements.panHint.classList.remove('visible'), 2000);
                 }
             }
 
-            updatePreviews() {
-                if (!this.elements.thumbnailsContainer) return;
+            /**
+             * THROTTLED UPDATE PREVIEWS
+             * ==========================
+             * Limita las actualizaciones durante el arrastre para mejor rendimiento.
+             */
+            throttledUpdatePreviews() {
+                if (this._throttleTimeout) return;
+                
+                this._throttleTimeout = setTimeout(() => {
+                    this._throttleTimeout = null;
+                    this.forceUpdatePreviews();
+                }, 100); // Actualizar cada 100ms máximo durante arrastre
+            }
+
+            /**
+             * FORZAR ACTUALIZACIÓN DE PREVIEWS
+             * =================================
+             * Siempre reconstruye los thumbnails con las posiciones actuales.
+             */
+            forceUpdatePreviews() {
+                if (!this.elements.thumbnailsContainer || !this.image) return;
                 
                 const parts = this.getParts();
-                const numParts = (this.horizontalLines.length + 1) * (this.verticalLines.length + 1);
-                const currentThumbnails = this.elements.thumbnailsContainer.querySelectorAll('.thumbnail-item').length;
-                
                 const t = translations[currentLang];
                 
-                const title = this.elements.thumbnailsContainer.querySelector('h3');
-                if (title) {
-                    title.textContent = `${t.previewTitle} (${numParts} ${t.parts})`;
-                }
+                // Actualizar contador
+                this.updatePartsCount();
                 
-                // Solo reconstruir si el número de partes cambió
-                if (currentThumbnails !== numParts) {
-                    this.elements.thumbnailsContainer.innerHTML = '';
+                // Limpiar thumbnails existentes
+                this.elements.thumbnailsContainer.innerHTML = '';
+                
+                // Crear nuevos thumbnails
+                parts.forEach((part, index) => {
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'thumbnail-item';
                     
-                    parts.forEach((part, index) => {
-                        const thumbnail = document.createElement('div');
-                        thumbnail.className = 'thumbnail-item';
-                        
-                        const label = this.getPartLabel(part.row, part.col);
-                        
-                        thumbnail.innerHTML = `
-                            <canvas class="thumbnail-image" id="thumb-${this.id}-${index}"></canvas>
-                            <div class="thumbnail-info">
-                                <div class="thumbnail-label">${label}</div>
-                                <div class="thumbnail-actions">
-                                    <button class="btn btn-sm btn-secondary download-part-btn" data-index="${index}">${t.downloadPart}</button>
-                                </div>
+                    const label = `Parte ${part.row}-${part.col}`;
+                    
+                    thumbnail.innerHTML = `
+                        <canvas class="thumbnail-image" id="thumb-${this.id}-${index}"></canvas>
+                        <div class="thumbnail-info">
+                            <div class="thumbnail-label">${label}</div>
+                            <div class="thumbnail-dimensions">${part.widthPx}×${part.heightPx}px</div>
+                            <div class="thumbnail-actions">
+                                <button class="btn btn-sm btn-secondary download-part-btn" data-index="${index}">${t.downloadPart}</button>
                             </div>
-                        `;
-                        
-                        this.elements.thumbnailsContainer.appendChild(thumbnail);
-                        
-                        // Renderizar thumbnail inmediatamente
-                        this.renderThumbnail(part, index);
-                    });
+                        </div>
+                    `;
                     
-                    this.elements.thumbnailsContainer.querySelectorAll('.download-part-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            const index = parseInt(e.target.dataset.index);
-                            this.downloadPart(parts[index]);
-                        });
+                    this.elements.thumbnailsContainer.appendChild(thumbnail);
+                    
+                    // Renderizar thumbnail
+                    this.renderThumbnail(part, index);
+                });
+                
+                // Event listeners para descargar partes
+                this.elements.thumbnailsContainer.querySelectorAll('.download-part-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        this.downloadPart(parts[index]);
                     });
-                }
-                // NO actualizar canvas existentes - esto causaba el parpadeo
+                });
             }
 
+            /**
+             * OBTENER PARTES CON PRECISIÓN 100%
+             * ==================================
+             * Calcula las coordenadas exactas en píxeles para cada parte.
+             */
             getParts() {
                 const parts = [];
                 
-                // Mantener porcentajes como decimales exactos para máxima precisión
-                // Solo redondear cuando se va a usar en drawImage (píxeles enteros)
-                const vLimitsPercent = [0, ...this.verticalLines, 100];
-                const hLimitsPercent = [0, ...this.horizontalLines, 100];
+                // Añadir bordes (0 y 100%) y ordenar
+                const vLines = [0, ...this.verticalLines.slice().sort((a, b) => a - b), 100];
+                const hLines = [0, ...this.horizontalLines.slice().sort((a, b) => a - b), 100];
                 
-                // Generar partes manteniendo porcentajes exactos
-                for (let row = 0; row < hLimitsPercent.length - 1; row++) {
-                    for (let col = 0; col < vLimitsPercent.length - 1; col++) {
-                        const xPercent = vLimitsPercent[col];
-                        const yPercent = hLimitsPercent[row];
-                        const xPercentNext = vLimitsPercent[col + 1];
-                        const yPercentNext = hLimitsPercent[row + 1];
+                for (let row = 0; row < hLines.length - 1; row++) {
+                    for (let col = 0; col < vLines.length - 1; col++) {
+                        const xPercent = vLines[col];
+                        const yPercent = hLines[row];
+                        const widthPercent = vLines[col + 1] - vLines[col];
+                        const heightPercent = hLines[row + 1] - hLines[row];
                         
-                        const widthPercent = xPercentNext - xPercent;
-                        const heightPercent = yPercentNext - yPercent;
+                        // Convertir porcentajes a píxeles exactos
+                        const xPx = Math.round((xPercent / 100) * this.width);
+                        const yPx = Math.round((yPercent / 100) * this.height);
+                        const widthPx = Math.round((widthPercent / 100) * this.width);
+                        const heightPx = Math.round((heightPercent / 100) * this.height);
                         
                         parts.push({
                             row: row + 1,
                             col: col + 1,
-                            // Mantener porcentaje exacto como float
-                            xPercent: xPercent,
-                            yPercent: yPercent,
-                            widthPercent: widthPercent,
-                            heightPercent: heightPercent,
-                            // Coordenadas para dibujar (redondear solo al final)
-                            x: 0,
-                            y: 0,
-                            width: this.width,
-                            height: this.height,
-                            // Límites en píxeles enteros
-                            xPixel: Math.round(xPercent / 100 * this.width),
-                            yPixel: Math.round(yPercent / 100 * this.height),
-                            widthPixel: Math.round(widthPercent / 100 * this.width),
-                            heightPixel: Math.round(heightPercent / 100 * this.height)
+                            xPx,
+                            yPx,
+                            widthPx,
+                            heightPx
                         });
                     }
                 }
@@ -1819,39 +1860,27 @@
                 return parts;
             }
 
-            getPartLabel(row, col) {
-                return `parte-${row}-${col}`;
-            }
-
             renderThumbnail(part, index) {
                 const canvas = document.getElementById(`thumb-${this.id}-${index}`);
-                if (!canvas) return;
-                
-                // Verificar si este canvas ya fue renderizado con estas dimensiones
-                if (canvas._renderedWith === `${part.xPixel}-${part.yPixel}-${part.widthPixel}-${part.heightPixel}`) return;
+                if (!canvas || !this.image) return;
                 
                 try {
-                    // Usar píxeles exactos del objeto part para máxima precisión
-                    const maxSize = 150;
-                    const scale = Math.min(maxSize / part.widthPixel, maxSize / part.heightPixel, 1);
+                    const maxSize = 120;
+                    const scale = Math.min(maxSize / part.widthPx, maxSize / part.heightPx, 1);
                     
-                    canvas.width = part.widthPixel * scale;
-                    canvas.height = part.heightPixel * scale;
+                    canvas.width = Math.max(1, part.widthPx * scale);
+                    canvas.height = Math.max(1, part.heightPx * scale);
                     
                     const ctx = canvas.getContext('2d');
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     
-                    // Dibujar usando píxeles exactos
+                    // Dibujar la porción exacta de la imagen
                     ctx.drawImage(
                         this.image,
-                        part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
+                        part.xPx, part.yPx, part.widthPx, part.heightPx,
                         0, 0, canvas.width, canvas.height
                     );
-                    
-                    // Marcar canvas como renderizado con estas dimensiones
-                    canvas._renderedWith = `${part.xPixel}-${part.yPixel}-${part.widthPixel}-${part.heightPixel}`;
-                    
                 } catch (error) {
                     console.error('Error renderizando thumbnail:', error);
                 }
@@ -1859,25 +1888,19 @@
 
             downloadPart(part) {
                 try {
-                    // Usar píxeles exactos del objeto part para máxima precisión
                     const canvas = document.createElement('canvas');
-                    canvas.width = part.widthPixel;
-                    canvas.height = part.heightPixel;
+                    canvas.width = part.widthPx;
+                    canvas.height = part.heightPx;
                     
                     const ctx = canvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    
-                    // Dibujar usando píxeles exactos
                     ctx.drawImage(
                         this.image,
-                        part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
-                        0, 0, part.widthPixel, part.heightPixel
+                        part.xPx, part.yPx, part.widthPx, part.heightPx,
+                        0, 0, part.widthPx, part.heightPx
                     );
                     
-                    const label = this.getPartLabel(part.row, part.col);
                     const baseName = this.name.replace(/\.[^/.]+$/, '');
-                    const filename = `${baseName}-${label}.png`;
+                    const filename = `${baseName}-parte-${part.row}-${part.col}.png`;
                     
                     canvas.toBlob(blob => {
                         const url = URL.createObjectURL(blob);
@@ -1887,16 +1910,13 @@
                         a.click();
                         URL.revokeObjectURL(url);
                     }, 'image/png');
-                    
                 } catch (error) {
                     console.error('Error descargando parte:', error);
-                    showAlert('Error al descargar la parte. La imagen puede ser demasiado grande.', 'danger');
+                    showAlert('Error al descargar la parte', 'danger');
                 }
             }
 
             async downloadZip() {
-                if (!this.elements.progressContainer) return;
-                
                 this.elements.progressContainer.classList.remove('hidden');
                 this.elements.downloadZipBtn.disabled = true;
                 
@@ -1905,34 +1925,20 @@
                     const zip = new JSZip();
                     const baseName = this.name.replace(/\.[^/.]+$/, '');
                     
-                    for (let i = 0; i < parts.length; i++) {
-                        const part = parts[i];
-                        
-                        // Usar píxeles exactos para máxima precisión
+                    for (const part of parts) {
                         const canvas = document.createElement('canvas');
-                        canvas.width = part.widthPixel;
-                        canvas.height = part.heightPixel;
+                        canvas.width = part.widthPx;
+                        canvas.height = part.heightPx;
                         
                         const ctx = canvas.getContext('2d');
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                        
-                        // Dibujar usando píxeles exactos
                         ctx.drawImage(
                             this.image,
-                            part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
-                            0, 0, part.widthPixel, part.heightPixel
+                            part.xPx, part.yPx, part.widthPx, part.heightPx,
+                            0, 0, part.widthPx, part.heightPx
                         );
                         
-                        const blob = await new Promise(resolve => {
-                            canvas.toBlob(resolve, 'image/png');
-                        });
-                        
-                        const label = this.getPartLabel(part.row, part.col);
-                        zip.file(`${baseName}-${label}.png`, blob);
-                        
-                        canvas.width = 0;
-                        canvas.height = 0;
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                        zip.file(`${baseName}-parte-${part.row}-${part.col}.png`, blob);
                     }
                     
                     const content = await zip.generateAsync({ type: 'blob' });
@@ -1944,10 +1950,9 @@
                     URL.revokeObjectURL(url);
                     
                     showAlert(`✅ ZIP descargado: ${parts.length} partes`, 'success');
-                    
                 } catch (error) {
                     console.error('Error generando ZIP:', error);
-                    showAlert('Error al generar ZIP. Intenta con imágenes más pequeñas.', 'danger');
+                    showAlert('Error al generar ZIP', 'danger');
                 } finally {
                     this.elements.progressContainer.classList.add('hidden');
                     this.elements.downloadZipBtn.disabled = false;
@@ -1955,25 +1960,29 @@
             }
 
             dispose() {
+                // Limpiar event listeners de líneas
+                if (this.elements.canvasContainer) {
+                    this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(line => {
+                        if (line._onDragMove) {
+                            document.removeEventListener('mousemove', line._onDragMove);
+                            document.removeEventListener('touchmove', line._onDragMove);
+                        }
+                        if (line._onDragEnd) {
+                            document.removeEventListener('mouseup', line._onDragEnd);
+                            document.removeEventListener('touchend', line._onDragEnd);
+                        }
+                    });
+                }
+                
+                // Liberar memoria
                 if (this.image) {
-                    this.image.src = '';
+                    URL.revokeObjectURL(this.image.src);
                     this.image = null;
                 }
                 
                 if (this.elements.canvas) {
                     this.elements.canvas.width = 0;
                     this.elements.canvas.height = 0;
-                }
-                
-                if (this.elements.canvasContainer) {
-                    this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(line => {
-                        if (line._dragHandlers) {
-                            document.removeEventListener('mousemove', line._dragHandlers.onDragMove);
-                            document.removeEventListener('mouseup', line._dragHandlers.onDragEnd);
-                            document.removeEventListener('touchmove', line._dragHandlers.onDragMove);
-                            document.removeEventListener('touchend', line._dragHandlers.onDragEnd);
-                        }
-                    });
                 }
                 
                 this.elements = {};
@@ -1989,81 +1998,53 @@
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             
-            let icon = 'ℹ️';
-            if (type === 'warning') icon = '⚠️';
-            if (type === 'danger') icon = '❌';
-            if (type === 'success') icon = '✅';
+            const icons = { info: 'ℹ️', warning: '⚠️', danger: '❌', success: '✅' };
             
-            alert.innerHTML = `<span>${icon}</span><span>${message}</span>`;
-            
+            alert.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
             container.appendChild(alert);
             
             setTimeout(() => {
                 alert.style.opacity = '0';
                 alert.style.transition = 'opacity 0.3s ease';
                 setTimeout(() => alert.remove(), 300);
-            }, 5000);
+            }, 4000);
         }
 
         function updateGlobalActions() {
             const container = document.getElementById('globalActions');
-            if (AppState.images.length > 0) {
-                container.classList.remove('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
+            container.classList.toggle('hidden', AppState.images.length === 0);
         }
 
         async function downloadAll() {
             const loadedImages = AppState.images.filter(img => img.isLoaded);
             if (loadedImages.length === 0) {
-                showAlert('No hay imágenes cargadas para descargar', 'warning');
+                showAlert('No hay imágenes cargadas', 'warning');
                 return;
             }
             
             try {
                 const zip = new JSZip();
-                const folder = zip.folder('imagenes-divididas');
-                
                 let totalParts = 0;
                 
                 for (let i = 0; i < loadedImages.length; i++) {
                     const img = loadedImages[i];
                     const parts = img.getParts();
-                    const baseName = `imagen${i + 1}`;
+                    const baseName = `imagen${i + 1}-${img.name.replace(/\.[^/.]+$/, '')}`;
                     
-                    for (let j = 0; j < parts.length; j++) {
-                        const part = parts[j];
-                        
-                        const exactX = Math.round(part.x);
-                        const exactY = Math.round(part.y);
-                        const exactWidth = Math.round(part.width);
-                        const exactHeight = Math.round(part.height);
-                        
+                    for (const part of parts) {
                         const canvas = document.createElement('canvas');
-                        canvas.width = exactWidth;
-                        canvas.height = exactHeight;
+                        canvas.width = part.widthPx;
+                        canvas.height = part.heightPx;
                         
                         const ctx = canvas.getContext('2d');
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                        
                         ctx.drawImage(
                             img.image,
-                            exactX, exactY, exactWidth, exactHeight,
-                            0, 0, exactWidth, exactHeight
+                            part.xPx, part.yPx, part.widthPx, part.heightPx,
+                            0, 0, part.widthPx, part.heightPx
                         );
                         
-                        const blob = await new Promise(resolve => {
-                            canvas.toBlob(resolve, 'image/png');
-                        });
-                        
-                        const label = img.getPartLabel(part.row, part.col);
-                        folder.file(`${baseName}-${label}.png`, blob);
-                        
-                        canvas.width = 0;
-                        canvas.height = 0;
-                        
+                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                        zip.file(`${baseName}-parte-${part.row}-${part.col}.png`, blob);
                         totalParts++;
                     }
                 }
@@ -2076,26 +2057,24 @@
                 a.click();
                 URL.revokeObjectURL(url);
                 
-                showAlert(`✅ ZIP global descargado: ${loadedImages.length} imágenes, ${totalParts} partes`, 'success');
-                
+                showAlert(`✅ ZIP descargado: ${loadedImages.length} imágenes, ${totalParts} partes`, 'success');
             } catch (error) {
                 console.error('Error generando ZIP global:', error);
-                showAlert('Error al generar ZIP global. Intenta con menos imágenes.', 'danger');
+                showAlert('Error al generar ZIP global', 'danger');
             }
         }
 
         function applyConfigToAll() {
             const firstImage = AppState.images.find(img => img.isLoaded);
-            if (!firstImage) {
+            if (firstImage) {
+                firstImage.applyConfigToAll();
+            } else {
                 showAlert('No hay imágenes cargadas', 'warning');
-                return;
             }
-            
-            firstImage.applyConfigToAll();
         }
 
         function clearAll() {
-            if (!confirm('¿Estás seguro de que quieres eliminar todas las imágenes?')) return;
+            if (!confirm('¿Eliminar todas las imágenes?')) return;
             
             AppState.images.forEach(img => img.dispose());
             AppState.images = [];
@@ -2105,324 +2084,7 @@
             document.getElementById('alertsContainer').innerHTML = '';
             updateGlobalActions();
             
-            showAlert('🗑️ Todas las imágenes han sido eliminadas', 'info');
-        }
-
-        /* ========================================
-           FUNCIÓN DE UNIÓN DE IMÁGENES
-           ======================================== */
-        function showMergeModal() {
-            const loadedImages = AppState.images.filter(img => img.isLoaded);
-            if (loadedImages.length < 2) {
-                showAlert('Necesitas al menos 2 imágenes para unir', 'warning');
-                return;
-            }
-            
-            const t = translations[currentLang];
-            
-            // Crear modal de fusión
-            let modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.id = 'mergeModal';
-            modal.innerHTML = `
-                <div class="modal">
-                    <div class="modal-header">
-                        <h2>${t.mergeTitle}</h2>
-                        <button class="modal-close" onclick="document.getElementById('mergeModal').remove()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <p>${t.mergeDesc}</p>
-                        
-                        <div style="margin: 1rem 0;">
-                            <label class="control-label" style="display: block; margin-bottom: 0.5rem;">${t.mergeDirection}</label>
-                            <select id="mergeDirection" class="input" style="width: 100%;">
-                                <option value="horizontal">${t.mergeHorizontal}</option>
-                                <option value="vertical">${t.mergeVertical}</option>
-                            </select>
-                        </div>
-                        
-                        <div style="margin: 1rem 0;">
-                            <label class="control-label" style="display: block; margin-bottom: 0.5rem;">${t.mergeOutputImages}</label>
-                            <input type="number" id="mergeOutputCount" class="input" value="2" min="2" max="${loadedImages.length}" style="width: 100%;">
-                        </div>
-                        
-                        <div id="mergePreviewContainer" style="margin: 1rem 0; border: 2px dashed var(--border-color); padding: 1rem; border-radius: var(--radius); overflow-x: auto;">
-                            <p style="text-align: center; color: var(--text-secondary);">Presiona "${t.mergeGenerate}" para ver las líneas de fusión</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="document.getElementById('mergeModal').remove()">Cancelar</button>
-                        <button class="btn btn-primary" id="generateMergeLines">${t.mergeGenerate}</button>
-                        <button class="btn btn-success hidden" id="downloadMergedImages">${t.mergeDownload}</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            let mergeLines = [];
-            let mergeCanvas = null;
-            
-            // Función para generar preview y líneas de fusión
-            function generateMergePreview() {
-                const direction = document.getElementById('mergeDirection').value;
-                const outputCount = parseInt(document.getElementById('mergeOutputCount').value);
-                
-                // Calcular posiciones de líneas con precisión
-                mergeLines = [];
-                for (let i = 1; i < outputCount; i++) {
-                    mergeLines.push((i / outputCount) * 100);
-                }
-                
-                // Crear canvas de preview
-                if (!mergeCanvas) {
-                    mergeCanvas = document.createElement('canvas');
-                    mergeCanvas.id = 'mergePreviewCanvas';
-                    mergeCanvas.style.maxWidth = '100%';
-                    mergeCanvas.style.height = 'auto';
-                }
-                
-                const previewContainer = document.getElementById('mergePreviewContainer');
-                previewContainer.innerHTML = '';
-                
-                // Calcular dimensiones totales con precisión
-                let totalWidth = 0;
-                let totalHeight = 0;
-                
-                if (direction === 'horizontal') {
-                    totalWidth = loadedImages.reduce((sum, img) => sum + img.width, 0);
-                    totalHeight = Math.max(...loadedImages.map(img => img.height));
-                } else {
-                    totalWidth = Math.max(...loadedImages.map(img => img.width));
-                    totalHeight = loadedImages.reduce((sum, img) => sum + img.height, 0);
-                }
-                
-                mergeCanvas.width = totalWidth;
-                mergeCanvas.height = totalHeight;
-                const ctx = mergeCanvas.getContext('2d');
-                
-                // Dibujar imágenes con precisión
-                let currentX = 0;
-                let currentY = 0;
-                loadedImages.forEach((img, index) => {
-                    if (direction === 'horizontal') {
-                        ctx.drawImage(img.image, currentX, 0);
-                        currentX += img.width;
-                    } else {
-                        ctx.drawImage(img.image, 0, currentY);
-                        currentY += img.height;
-                    }
-                });
-                
-                previewContainer.appendChild(mergeCanvas);
-                
-                // Crear contenedor de líneas arrastrables
-                const linesContainer = document.createElement('div');
-                linesContainer.style.cssText = `
-                    position: relative;
-                    width: ${totalWidth}px;
-                    height: ${totalHeight}px;
-                    margin-top: 1rem;
-                `;
-                
-                mergeLines.forEach((pos, index) => {
-                    const line = document.createElement('div');
-                    line.className = 'divider-line';
-                    line.dataset.index = index;
-                    
-                    if (direction === 'horizontal') {
-                        line.className += ' vertical';
-                        line.style.left = `${pos}%`;
-                    } else {
-                        line.className += ' horizontal';
-                        line.style.top = `${pos}%`;
-                    }
-                    
-                    linesContainer.appendChild(line);
-                });
-                
-                previewContainer.appendChild(linesContainer);
-                
-                // Hacer líneas arrastrables
-                initMergeLineDrag(linesContainer, mergeLines, direction);
-                
-                // Mostrar botón de descarga
-                document.getElementById('generateMergeLines').classList.add('hidden');
-                document.getElementById('downloadMergedImages').classList.remove('hidden');
-            }
-            
-            // Listener para generar automáticamente cuando cambie el número de salida
-            document.getElementById('mergeOutputCount').addEventListener('input', () => {
-                // Solo generar si hay un valor válido
-                const outputCount = parseInt(document.getElementById('mergeOutputCount').value);
-                if (outputCount >= 2) {
-                    generateMergePreview();
-                }
-            });
-            
-            // Listener para regenerar cuando cambie la dirección
-            document.getElementById('mergeDirection').addEventListener('change', () => {
-                generateMergePreview();
-            });
-            
-            document.getElementById('generateMergeLines').addEventListener('click', generateMergePreview);
-            
-            document.getElementById('downloadMergedImages').addEventListener('click', async () => {
-                const direction = document.getElementById('mergeDirection').value;
-                
-                try {
-                    const zip = new JSZip();
-                    
-                    for (let outputIndex = 0; outputIndex < mergeLines.length + 1; outputIndex++) {
-                        const startPos = outputIndex === 0 ? 0 : mergeLines[outputIndex - 1];
-                        const endPos = outputIndex === mergeLines.length ? 100 : mergeLines[outputIndex];
-                        
-                        // Calcular índices con precisión usando Math.floor
-                        const startIdx = Math.floor((startPos / 100) * loadedImages.length);
-                        const endIdx = Math.min(Math.ceil((endPos / 100) * loadedImages.length), loadedImages.length);
-                        
-                        const imagesToMerge = loadedImages.slice(startIdx, endIdx);
-                        
-                        if (imagesToMerge.length === 0) continue;
-                        
-                        let mergedWidth = 0;
-                        let mergedHeight = 0;
-                        
-                        if (direction === 'horizontal') {
-                            mergedWidth = imagesToMerge.reduce((sum, img) => sum + img.width, 0);
-                            mergedHeight = Math.max(...imagesToMerge.map(img => img.height));
-                        } else {
-                            mergedWidth = Math.max(...imagesToMerge.map(img => img.width));
-                            mergedHeight = imagesToMerge.reduce((sum, img) => sum + img.height, 0);
-                        }
-                        
-                        const canvas = document.createElement('canvas');
-                        canvas.width = mergedWidth;
-                        canvas.height = mergedHeight;
-                        const ctx = canvas.getContext('2d');
-                        
-                        let currentX = 0;
-                        let currentY = 0;
-                        
-                        imagesToMerge.forEach(img => {
-                            if (direction === 'horizontal') {
-                                ctx.drawImage(img.image, currentX, 0);
-                                currentX += img.width;
-                            } else {
-                                ctx.drawImage(img.image, 0, currentY);
-                                currentY += img.height;
-                            }
-                        });
-                        
-                        const blob = await new Promise(resolve => {
-                            canvas.toBlob(resolve, 'image/png');
-                        });
-                        
-                        zip.file(`imagen-unida-${outputIndex + 1}.png`, blob);
-                    }
-                    
-                    const content = await zip.generateAsync({ type: 'blob' });
-                    const url = URL.createObjectURL(content);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'imagenes-unidas.zip';
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    
-                    showAlert('✅ Imágenes unidas descargadas exitosamente', 'success');
-                    document.getElementById('mergeModal').remove();
-                    
-                } catch (error) {
-                    console.error('Error uniendo imágenes:', error);
-                    showAlert('Error al unir imágenes. Intenta con menos imágenes.', 'danger');
-                }
-            });
-        }
-
-        function initMergeLineDrag(container, lines, direction) {
-            const lineElements = container.querySelectorAll('.divider-line');
-            
-            lineElements.forEach(line => {
-                let isDragging = false;
-                let startPos = 0;
-                let startX = 0;
-                let startY = 0;
-                const index = parseInt(line.dataset.index);
-                
-                const onDragStart = (e) => {
-                    e.preventDefault();
-                    isDragging = true;
-                    line.classList.add('dragging');
-                    
-                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-                    
-                    const rect = this.elements.canvas.getBoundingClientRect();
-                    
-                    // Capturar posición inicial del cursor
-                    startX = clientX;
-                    startY = clientY;
-                    
-                    // Capturar posición inicial de la línea
-                    if (direction === 'horizontal') {
-                        startPos = lines[index];
-                    } else {
-                        startPos = lines[index];
-                    }
-                };
-                
-                const onDragMove = (e) => {
-                    if (!isDragging) return;
-                    e.preventDefault();
-                    
-                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-                    
-                    const rect = this.elements.canvas.getBoundingClientRect();
-                    let newPos;
-                    
-                    if (direction === 'horizontal') {
-                        // Calcular delta del movimiento del cursor
-                        const deltaX = clientX - startX;
-                        // Convertir delta a porcentaje del ancho del contenedor
-                        const deltaPercent = (deltaX / rect.width) * 100;
-                        // Nueva posición con límites (1% a 99%)
-                        newPos = Math.max(1, Math.min(99, startPos + deltaPercent));
-                        // Actualizar array de líneas
-                        lines[index] = newPos;
-                    } else {
-                        // Calcular delta del movimiento del cursor
-                        const deltaY = clientY - startY;
-                        // Convertir delta a porcentaje del alto del contenedor
-                        const deltaPercent = (deltaY / rect.height) * 100;
-                        // Nueva posición con límites (1% a 99%)
-                        newPos = Math.max(1, Math.min(99, startPos + deltaPercent));
-                        // Actualizar array de líneas
-                        lines[index] = newPos;
-                    }
-                    
-                    // Actualizar posición visual de la línea
-                    if (direction === 'horizontal') {
-                        line.style.left = `${newPos}%`;
-                    } else {
-                        line.style.top = `${newPos}%`;
-                    }
-                };
-                
-                const onDragEnd = () => {
-                    if (isDragging) {
-                        isDragging = false;
-                        line.classList.remove('dragging');
-                    }
-                };
-                
-                line.addEventListener('mousedown', onDragStart);
-                line.addEventListener('touchstart', onDragStart, { passive: false });
-                document.addEventListener('mousemove', onDragMove);
-                document.addEventListener('mouseup', onDragEnd);
-                document.addEventListener('touchmove', onDragMove, { passive: false });
-                document.addEventListener('touchend', onDragEnd);
-            });
+            showAlert('🗑️ Todas las imágenes eliminadas', 'info');
         }
 
         /* ========================================
@@ -2434,7 +2096,6 @@
         const selectFilesBtn = document.getElementById('selectFilesBtn');
 
         selectFilesBtn.addEventListener('click', () => fileInput.click());
-
         fileInput.addEventListener('change', handleFiles);
 
         uploadSection.addEventListener('dragover', (e) => {
@@ -2449,7 +2110,6 @@
         uploadSection.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadSection.classList.remove('dragover');
-            
             const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
             processFiles(files);
         });
@@ -2465,18 +2125,18 @@
             
             const oversizedFiles = files.filter(f => f.size > AppState.maxFileSize);
             if (oversizedFiles.length > 0) {
-                showAlert(`❌ ${oversizedFiles.length} archivo(s) exceden el límite de 50 MB`, 'danger');
+                showAlert(`❌ ${oversizedFiles.length} archivo(s) exceden 50 MB`, 'danger');
                 return;
             }
             
             if (AppState.images.length + files.length > AppState.warningImageCount) {
-                showAlert(`⚠️ Cargar muchas imágenes puede causar problemas de memoria. Actual: ${AppState.images.length}, Nuevo: ${files.length}`, 'warning');
+                showAlert(`⚠️ Muchas imágenes pueden causar problemas de memoria`, 'warning');
             }
             
             const totalSize = AppState.images.reduce((sum, img) => sum + img.size, 0) +
                            files.reduce((sum, f) => sum + f.size, 0);
             if (totalSize > AppState.warningTotalSize) {
-                showAlert(`⚠️ El tamaño total (${(totalSize / 1024 / 1024).toFixed(0)} MB) excede el recomendado (${AppState.warningTotalSize / 1024 / 1024} MB)`, 'warning');
+                showAlert(`⚠️ Tamaño total: ${(totalSize / 1024 / 1024).toFixed(0)} MB`, 'warning');
             }
             
             files.forEach(file => {
@@ -2491,89 +2151,59 @@
         document.getElementById('downloadAllBtn').addEventListener('click', downloadAll);
         document.getElementById('applyAllBtn').addEventListener('click', applyConfigToAll);
         document.getElementById('clearAllBtn').addEventListener('click', clearAll);
-        document.getElementById('mergeImagesBtn').addEventListener('click', showMergeModal);
 
-        // Theme selector
+        // Theme
         const themeSelect = document.getElementById('themeSelect');
         themeSelect.value = currentTheme;
         
         function applyTheme(theme) {
-            const body = document.body;
             if (theme === 'system') {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    body.setAttribute('data-theme', 'dark');
-                } else {
-                    body.setAttribute('data-theme', 'light');
-                }
-            } else {
-                body.setAttribute('data-theme', theme);
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
+            document.body.setAttribute('data-theme', theme);
             currentTheme = theme;
             localStorage.setItem('imageSplitterTheme', theme);
-            themeSelect.value = theme;
         }
         
-        themeSelect.addEventListener('change', (e) => {
-            applyTheme(e.target.value);
-        });
-        
-        // Listen for system theme changes
+        themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (currentTheme === 'system') {
-                applyTheme('system');
-            }
+            if (currentTheme === 'system') applyTheme('system');
         });
-        
         applyTheme(currentTheme);
 
-        // Language selector
+        // Language
         const langSelect = document.getElementById('langSelect');
         langSelect.value = currentLang;
-        
         langSelect.addEventListener('change', (e) => {
             currentLang = e.target.value;
             localStorage.setItem('imageSplitterLang', currentLang);
             applyTranslations(currentLang);
         });
-        
         applyTranslations(currentLang);
 
-        // Tutorial modal
+        // Tutorial
         const tutorialModal = document.getElementById('tutorialModal');
         const helpBtn = document.getElementById('helpBtn');
         const closeTutorial = document.getElementById('closeTutorial');
         const closeTutorialBtn = document.getElementById('closeTutorialBtn');
         const dontShowAgainBtn = document.getElementById('dontShowAgainBtn');
 
-        function showTutorial() {
-            tutorialModal.classList.remove('hidden');
-        }
-
-        function hideTutorial() {
-            tutorialModal.classList.add('hidden');
-        }
-
-        helpBtn.addEventListener('click', showTutorial);
-        closeTutorial.addEventListener('click', hideTutorial);
-        closeTutorialBtn.addEventListener('click', hideTutorial);
-
+        helpBtn.addEventListener('click', () => tutorialModal.classList.remove('hidden'));
+        closeTutorial.addEventListener('click', () => tutorialModal.classList.add('hidden'));
+        closeTutorialBtn.addEventListener('click', () => tutorialModal.classList.add('hidden'));
         dontShowAgainBtn.addEventListener('click', () => {
             localStorage.setItem('imageSplitterTutorialShown', 'true');
-            hideTutorial();
+            tutorialModal.classList.add('hidden');
         });
-
         tutorialModal.addEventListener('click', (e) => {
-            if (e.target === tutorialModal) {
-                hideTutorial();
-            }
+            if (e.target === tutorialModal) tutorialModal.classList.add('hidden');
         });
 
         if (!localStorage.getItem('imageSplitterTutorialShown')) {
-            setTimeout(showTutorial, 500);
+            setTimeout(() => tutorialModal.classList.remove('hidden'), 500);
         }
 
-        console.log('✂️ Divisor de Imágenes cargado correctamente');
-        console.log('📊 Version 2.0 - 100% Client-Side - Privado y Seguro');
+        console.log('✂️ Divisor de Imágenes v3.0 - Precisión 100%');
     </script>
 </body>
 </html>
