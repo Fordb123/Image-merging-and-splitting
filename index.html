@@ -388,15 +388,17 @@
             cursor: grabbing;
         }
 
+        /* ========================================
+           PREVIEW CANVAS PARA MANTENER LÍNEAS 100% PRECISAS
+           ======================================== */
         .preview-canvas-container {
             position: relative;
             display: block;
-            max-width: 100%;
+            /* NO max-width para mantener dimensiones originales exactas */
         }
 
         .preview-canvas {
             display: block;
-            /* Sin max-width para mantener dimensiones exactas */
             touch-action: none;
         }
 
@@ -417,24 +419,24 @@
             background: #f87171;
         }
 
-        /* Líneas verticales - Centradas exactamente en el punto de corte */
+        /* Líneas verticales - POSICIONADAS POR PORCENTAJES DEL CANVAS */
         .divider-line.vertical {
             top: 0;
             bottom: 0;
             width: var(--line-width);
             height: 100%;
-            /* Transform: -50% centra horizontalmente, -1px compensa el ancho */
-            transform: translateX(calc(var(--line-width) * -0.5 - 1px));
+            /* Importante: Las líneas se posicionan por porcentaje del canvas REAL, no del offset visual */
+            transform: translateX(calc(var(--line-width) * -0.5));
         }
 
-        /* Líneas horizontales - Centradas exactamente en el punto de corte */
+        /* Líneas horizontales - POSICIONADAS POR PORCENTAJES DEL CANVAS */
         .divider-line.horizontal {
             left: 0;
             right: 0;
             height: var(--line-width);
             width: 100%;
-            /* Transform: -50% centra verticalmente, -1px compensa el alto */
-            transform: translateY(calc(var(--line-width) * -0.5 - 1px));
+            /* Importante: Las líneas se posicionan por porcentaje del canvas REAL, no del offset visual */
+            transform: translateY(calc(var(--line-width) * -0.5));
         }
 
         /* Área táctil expandida */
@@ -1776,31 +1778,40 @@
             getParts() {
                 const parts = [];
                 
-                // Mantener los porcentajes exactos como decimales para máxima precisión
-                // Solo convertir a píxeles enteros cuando se renderiza en el canvas
+                // Mantener porcentajes como decimales exactos para máxima precisión
+                // Solo redondear cuando se va a usar en drawImage (píxeles enteros)
                 const vLimitsPercent = [0, ...this.verticalLines, 100];
                 const hLimitsPercent = [0, ...this.horizontalLines, 100];
                 
-                // Generar partes con coordenadas como decimales (píxeles fraccionarios)
+                // Generar partes manteniendo porcentajes exactos
                 for (let row = 0; row < hLimitsPercent.length - 1; row++) {
                     for (let col = 0; col < vLimitsPercent.length - 1; col++) {
                         const xPercent = vLimitsPercent[col];
                         const yPercent = hLimitsPercent[row];
-                        const widthPercent = vLimitsPercent[col + 1] - xPercent;
-                        const heightPercent = hLimitsPercent[row + 1] - yPercent;
+                        const xPercentNext = vLimitsPercent[col + 1];
+                        const yPercentNext = hLimitsPercent[row + 1];
+                        
+                        const widthPercent = xPercentNext - xPercent;
+                        const heightPercent = yPercentNext - yPercent;
                         
                         parts.push({
                             row: row + 1,
                             col: col + 1,
+                            // Mantener porcentaje exacto como float
                             xPercent: xPercent,
                             yPercent: yPercent,
                             widthPercent: widthPercent,
                             heightPercent: heightPercent,
-                            // Para dibujo: convertir a píxeles
-                            x: Math.round(xPercent / 100 * this.width),
-                            y: Math.round(yPercent / 100 * this.height),
-                            width: Math.round(widthPercent / 100 * this.width),
-                            height: Math.round(heightPercent / 100 * this.height)
+                            // Coordenadas para dibujar (redondear solo al final)
+                            x: 0,
+                            y: 0,
+                            width: this.width,
+                            height: this.height,
+                            // Límites en píxeles enteros
+                            xPixel: Math.round(xPercent / 100 * this.width),
+                            yPixel: Math.round(yPercent / 100 * this.height),
+                            widthPixel: Math.round(widthPercent / 100 * this.width),
+                            heightPixel: Math.round(heightPercent / 100 * this.height)
                         });
                     }
                 }
@@ -1816,29 +1827,30 @@
                 const canvas = document.getElementById(`thumb-${this.id}-${index}`);
                 if (!canvas) return;
                 
-                // Verificar si este canvas ya fue renderizado con esta parte
-                if (canvas._renderedWith === `${part.x}-${part.y}-${part.width}-${part.height}`) return;
+                // Verificar si este canvas ya fue renderizado con estas dimensiones
+                if (canvas._renderedWith === `${part.xPixel}-${part.yPixel}-${part.widthPixel}-${part.heightPixel}`) return;
                 
                 try {
-                    // Usar coordenadas exactas sin redondear
+                    // Usar píxeles exactos del objeto part para máxima precisión
                     const maxSize = 150;
-                    const scale = Math.min(maxSize / part.width, maxSize / part.height, 1);
+                    const scale = Math.min(maxSize / part.widthPixel, maxSize / part.heightPixel, 1);
                     
-                    canvas.width = part.width * scale;
-                    canvas.height = part.height * scale;
+                    canvas.width = part.widthPixel * scale;
+                    canvas.height = part.heightPixel * scale;
                     
                     const ctx = canvas.getContext('2d');
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     
+                    // Dibujar usando píxeles exactos
                     ctx.drawImage(
                         this.image,
-                        part.x, part.y, part.width, part.height,
+                        part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
                         0, 0, canvas.width, canvas.height
                     );
                     
-                    // Marcar canvas como renderizado con estas coordenadas
-                    canvas._renderedWith = `${part.x}-${part.y}-${part.width}-${part.height}`;
+                    // Marcar canvas como renderizado con estas dimensiones
+                    canvas._renderedWith = `${part.xPixel}-${part.yPixel}-${part.widthPixel}-${part.heightPixel}`;
                     
                 } catch (error) {
                     console.error('Error renderizando thumbnail:', error);
@@ -1847,19 +1859,20 @@
 
             downloadPart(part) {
                 try {
-                    // Usar coordenadas exactas sin redondear
+                    // Usar píxeles exactos del objeto part para máxima precisión
                     const canvas = document.createElement('canvas');
-                    canvas.width = part.width;
-                    canvas.height = part.height;
+                    canvas.width = part.widthPixel;
+                    canvas.height = part.heightPixel;
                     
                     const ctx = canvas.getContext('2d');
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     
+                    // Dibujar usando píxeles exactos
                     ctx.drawImage(
                         this.image,
-                        part.x, part.y, part.width, part.height,
-                        0, 0, part.width, part.height
+                        part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
+                        0, 0, part.widthPixel, part.heightPixel
                     );
                     
                     const label = this.getPartLabel(part.row, part.col);
@@ -1895,19 +1908,20 @@
                     for (let i = 0; i < parts.length; i++) {
                         const part = parts[i];
                         
-                        // Usar coordenadas exactas sin redondear
+                        // Usar píxeles exactos para máxima precisión
                         const canvas = document.createElement('canvas');
-                        canvas.width = part.width;
-                        canvas.height = part.height;
+                        canvas.width = part.widthPixel;
+                        canvas.height = part.heightPixel;
                         
                         const ctx = canvas.getContext('2d');
                         ctx.imageSmoothingEnabled = true;
                         ctx.imageSmoothingQuality = 'high';
                         
+                        // Dibujar usando píxeles exactos
                         ctx.drawImage(
                             this.image,
-                            part.x, part.y, part.width, part.height,
-                            0, 0, part.width, part.height
+                            part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
+                            0, 0, part.widthPixel, part.heightPixel
                         );
                         
                         const blob = await new Promise(resolve => {
