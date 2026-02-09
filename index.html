@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">Divisor de Imágenes Gratuito Online - Múltiples Fotos, Divisiones Independientes o Globales, Automático por Número de Partes</title>
-    <meta name="description" data-i18n="description" content="Divisor de imágenes online gratuito. Divide múltiples imágenes simultáneamente con control independiente o global. Soporte para filas/columnas personalizables, líneas arrastrables y descarga en ZIP.">
-    <meta name="keywords" content="dividir imágenes, image splitter, cortar imágenes, dividir foto online, image slicer, image grid">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" data-i18n="ogTitle" content="Divisor de Imágenes Gratuito Online">
-    <meta property="og:description" data-i18n="ogDescription" content="Divide múltiples imágenes simultáneamente con control independiente o global. Gratis y 100% client-side.">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
-    
-    <!-- JSZip para generación de ZIP -->
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    
+    <title>Divisor de Imágenes - 100% Preciso</title>
+    <meta name="description" content="Divide imágenes con precisión del 100%. Gratis, privado y 100% client-side.">
     <style>
-        /* ========================================
-           VARIABLES CSS Y TEMA
-           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --bg-primary: #ffffff;
             --bg-secondary: #f5f5f5;
@@ -26,20 +19,18 @@
             --text-primary: #1a1a1a;
             --text-secondary: #666666;
             --border-color: #e0e0e0;
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary-color: #16a34a;
+            --primary-hover: #15803d;
             --danger-color: #dc2626;
             --success-color: #16a34a;
             --warning-color: #f59e0b;
             --shadow: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
             --radius: 8px;
-            --line-vertical-color: #3b82f6;
-            --line-horizontal-color: #ef4444;
-            --line-width: 3px;
+            --line-color: #ef4444;
+            --line-width: 2px;
         }
 
-        /* Tema oscuro */
         [data-theme="dark"] {
             --bg-primary: #0f0f0f;
             --bg-secondary: #1a1a1a;
@@ -47,19 +38,10 @@
             --text-primary: #e5e5e5;
             --text-secondary: #a3a3a3;
             --border-color: #404040;
-            --primary-color: #3b82f6;
-            --primary-hover: #60a5fa;
+            --primary-color: #22c55e;
+            --primary-hover: #16a34a;
             --shadow: 0 1px 3px rgba(0,0,0,0.3);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.3);
-        }
-
-        /* ========================================
-           ESTILOS BASE
-           ======================================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
         }
 
         body {
@@ -72,9 +54,6 @@
             flex-direction: column;
         }
 
-        /* ========================================
-           HEADER
-           ======================================== */
         header {
             background: var(--bg-secondary);
             padding: 1rem 2rem;
@@ -97,7 +76,6 @@
         .header-title h1 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--text-primary);
         }
 
         .header-title p {
@@ -105,15 +83,6 @@
             color: var(--text-secondary);
         }
 
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        /* ========================================
-           BOTONES
-           ======================================== */
         .btn {
             padding: 0.5rem 1rem;
             border: none;
@@ -125,48 +94,43 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-hover);
-        }
-
-        .btn-secondary {
             background: var(--bg-secondary);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
 
-        .btn-secondary:hover:not(:disabled) {
+        .btn:hover {
             background: var(--border-color);
         }
 
-        .btn-success {
-            background: var(--success-color);
+        .btn-primary {
+            background: var(--primary-color);
             color: white;
+            border: none;
         }
 
-        .btn-success:hover:not(:disabled) {
-            background: #15803d;
+        .btn-primary:hover {
+            background: var(--primary-hover);
         }
 
         .btn-danger {
             background: var(--danger-color);
             color: white;
+            border: none;
         }
 
-        .btn-danger:hover:not(:disabled) {
+        .btn-danger:hover {
             background: #b91c1c;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
         }
 
         .btn-sm {
@@ -174,9 +138,6 @@
             font-size: 0.75rem;
         }
 
-        /* ========================================
-           INPUTS
-           ======================================== */
         .input {
             padding: 0.5rem;
             border: 1px solid var(--border-color);
@@ -189,7 +150,6 @@
         .input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
         }
 
         .input-sm {
@@ -198,15 +158,12 @@
             width: 70px;
         }
 
-        /* ========================================
-           ALERTAS Y MENSAJES
-           ======================================== */
         .alert {
             padding: 1rem;
             border-radius: var(--radius);
             margin-bottom: 1rem;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.75rem;
         }
 
@@ -220,18 +177,6 @@
             background: #451a03;
             color: #fcd34d;
             border-color: #92400e;
-        }
-
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
-        }
-
-        [data-theme="dark"] .alert-info {
-            background: #1e3a5f;
-            color: #93c5fd;
-            border-color: #1e40af;
         }
 
         .alert-danger {
@@ -253,18 +198,33 @@
         }
 
         [data-theme="dark"] .alert-success {
-            background: #14532d;
+            background: #052e16;
             color: #86efac;
             border-color: #166534;
         }
 
-        /* ========================================
-           SECCIÓN DE IMÁGENES
-           ======================================== */
-        .images-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .upload-section {
+            background: var(--bg-card);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover, .upload-section.dragover {
+            border-color: var(--primary-color);
+            background: var(--bg-secondary);
         }
 
         .image-section {
@@ -273,11 +233,9 @@
             box-shadow: var(--shadow);
             overflow: hidden;
             border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
         }
 
-        /* ========================================
-           CONTROLES SUPERIORES POR IMAGEN
-           ======================================== */
         .image-controls {
             background: var(--bg-secondary);
             padding: 1rem;
@@ -302,7 +260,6 @@
 
         .image-name {
             font-weight: 600;
-            color: var(--text-primary);
             font-size: 0.875rem;
         }
 
@@ -311,68 +268,10 @@
             color: var(--text-secondary);
         }
 
-        .control-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .switch-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--border-color);
-            transition: 0.3s;
-            border-radius: 24px;
-        }
-
-        .switch-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        .switch input:checked + .switch-slider {
-            background: var(--primary-color);
-        }
-
-        .switch input:checked + .switch-slider:before {
-            transform: translateX(20px);
-        }
-
-        /* ========================================
-           PREVIEW WRAPPER CON CANVAS - CENTRADO
-           ======================================== */
         .preview-container {
             padding: 1rem;
             background: var(--bg-primary);
+            overflow: hidden;
         }
 
         .preview-wrapper {
@@ -382,179 +281,122 @@
             position: relative;
             background: repeating-conic-gradient(var(--border-color) 0% 25%, var(--bg-primary) 0% 50%) 50% / 20px 20px;
             border-radius: var(--radius);
-            overflow: hidden;
-            min-height: 300px;
-            padding: 40px;
-        }
-
-        .preview-wrapper.pan-enabled {
             overflow: auto;
-            cursor: grab;
+            min-height: 300px;
             padding: 60px;
         }
 
-        .preview-wrapper.pan-enabled:active {
-            cursor: grabbing;
-        }
-
-        /* ========================================
-           PREVIEW CANVAS CONTAINER - CLAVE PARA PRECISIÓN
-           ======================================== */
         .preview-canvas-container {
             position: relative;
-            display: inline-block;
-            /* El contenedor toma el tamaño exacto del canvas */
+            display: block;
+            flex-shrink: 0;
+            /* Importante: Las dimensiones se establecen dinámicamente para igualar al canvas real */
         }
 
         .preview-canvas {
             display: block;
             touch-action: none;
-            /* Canvas mantiene su tamaño original */
+            /* Importante: transform origin en top-left para precisión */
+            transform-origin: top left;
         }
 
-        /* ========================================
-           LÍNEAS DIVISORAS - COLORES DIFERENCIADOS
-           ======================================== */
         .divider-line {
             position: absolute;
+            background: var(--line-color);
+            cursor: move;
             z-index: 10;
-            opacity: 0.9;
-            transition: opacity 0.2s ease, transform 0.1s ease;
-            /* Prevenir que el usuario seleccione texto al arrastrar */
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* Líneas verticales - AZULES */
-        .divider-line.vertical {
-            top: 0;
-            height: 100%;
-            width: var(--line-width);
-            background: var(--line-vertical-color);
-            cursor: ew-resize;
-            /* Centrar la línea en su posición */
-            transform: translateX(-50%);
-        }
-
-        /* Líneas horizontales - ROJAS */
-        .divider-line.horizontal {
-            left: 0;
-            width: 100%;
-            height: var(--line-width);
-            background: var(--line-horizontal-color);
-            cursor: ns-resize;
-            /* Centrar la línea en su posición */
-            transform: translateY(-50%);
+            opacity: 0.8;
+            transition: opacity 0.2s ease, background 0.2s ease;
+            pointer-events: auto;
         }
 
         .divider-line:hover, .divider-line.dragging {
             opacity: 1;
-            z-index: 20;
-        }
-
-        .divider-line.vertical:hover, .divider-line.vertical.dragging {
-            transform: translateX(-50%) scaleX(2);
-            background: #60a5fa;
-        }
-
-        .divider-line.horizontal:hover, .divider-line.horizontal.dragging {
-            transform: translateY(-50%) scaleY(2);
             background: #f87171;
         }
 
-        /* Área táctil expandida para móvil */
+        .divider-line.vertical {
+            top: 0;
+            bottom: 0;
+            width: var(--line-width);
+            transform: translateX(calc(var(--line-width) * -0.5));
+        }
+
+        .divider-line.horizontal {
+            left: 0;
+            right: 0;
+            height: var(--line-width);
+            transform: translateY(calc(var(--line-width) * -0.5));
+        }
+
         .divider-line::before {
             content: '';
             position: absolute;
-            z-index: -1;
-        }
-
-        .divider-line.vertical::before {
-            top: 0;
-            bottom: 0;
+            background: transparent;
+            z-index: 1;
             left: -15px;
             right: -15px;
-        }
-
-        .divider-line.horizontal::before {
-            left: 0;
-            right: 0;
             top: -15px;
             bottom: -15px;
         }
 
-        /* ========================================
-           CONTROLES DE ZOOM
-           ======================================== */
         .zoom-controls {
-            position: absolute;
-            bottom: 1rem;
-            right: 1rem;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
             display: flex;
             gap: 0.5rem;
             background: var(--bg-card);
-            padding: 0.5rem;
+            padding: 0.75rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
-            z-index: 20;
+            z-index: 1000;
         }
 
         .zoom-level {
             padding: 0.5rem;
             font-size: 0.75rem;
             color: var(--text-secondary);
-            min-width: 60px;
+            min-width: 70px;
             text-align: center;
         }
 
         .pan-hint {
-            position: absolute;
-            top: 1rem;
+            position: fixed;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-card);
-            padding: 0.75rem 1.25rem;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
             border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            font-size: 0.875rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: var(--text-primary);
-            z-index: 20;
+            z-index: 1000;
             opacity: 0;
+            pointer-events: none;
             transition: opacity 0.3s ease;
-            max-width: 90%;
-            text-align: center;
         }
 
         .pan-hint.visible {
             opacity: 1;
         }
 
-        /* ========================================
-           THUMBNAILS DE PREVISIÓN
-           ======================================== */
         .preview-thumbnails {
             padding: 1rem;
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
         }
 
-        .preview-thumbnails-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .preview-thumbnails-header h3 {
+        .preview-thumbnails h3 {
             font-size: 0.875rem;
             font-weight: 600;
-            color: var(--text-primary);
+            margin-bottom: 1rem;
         }
 
         .thumbnails-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 1rem;
         }
 
@@ -562,8 +404,7 @@
             background: var(--bg-card);
             border-radius: var(--radius);
             overflow: hidden;
-            border: 2px solid var(--border-color);
-            transition: border-color 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
         }
 
         .thumbnail-item:hover {
@@ -576,13 +417,11 @@
             aspect-ratio: 1;
             object-fit: contain;
             display: block;
-            background: var(--bg-primary);
         }
 
         .thumbnail-info {
             padding: 0.5rem;
             text-align: center;
-            background: var(--bg-secondary);
         }
 
         .thumbnail-label {
@@ -592,22 +431,12 @@
             word-break: break-word;
         }
 
-        .thumbnail-dimensions {
-            font-size: 0.625rem;
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
-
         .thumbnail-actions {
             display: flex;
             gap: 0.25rem;
             justify-content: center;
-            margin-top: 0.25rem;
         }
 
-        /* ========================================
-           ACTIONS POR IMAGEN
-           ======================================== */
         .image-actions {
             padding: 1rem;
             background: var(--bg-secondary);
@@ -619,15 +448,6 @@
             align-items: center;
         }
 
-        .image-actions-left {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        /* ========================================
-           ACCIONES GLOBALES
-           ======================================== */
         .global-actions {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -642,215 +462,10 @@
             justify-content: space-between;
         }
 
-        .global-actions h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        .hidden {
+            display: none !important;
         }
 
-        .global-actions-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        /* ========================================
-           CONTROLES DE CARGA
-           ======================================== */
-        .upload-section {
-            background: var(--bg-card);
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius);
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .upload-section:hover, .upload-section.dragover {
-            border-color: var(--primary-color);
-            background: var(--bg-secondary);
-        }
-
-        .upload-section h2 {
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .upload-section p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        /* ========================================
-           PROGRESS/SPINNER
-           ======================================== */
-        .progress-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-color);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ========================================
-           THEME AND LANGUAGE CONTROLS
-           ======================================== */
-        .header-settings {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .settings-select {
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            cursor: pointer;
-        }
-
-        /* ========================================
-           TUTORIAL MODAL
-           ======================================== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-
-        .modal {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h2 {
-            font-size: 1.25rem;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius);
-        }
-
-        .modal-close:hover {
-            background: var(--bg-secondary);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .modal-body h3 {
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-
-        .modal-body h3:first-child {
-            margin-top: 0;
-        }
-
-        .modal-body p, .modal-body li {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .modal-body ul {
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .modal-body li {
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        /* Leyenda de colores de líneas */
-        .line-legend {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-        }
-
-        .line-legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .line-legend-color {
-            width: 20px;
-            height: 4px;
-            border-radius: 2px;
-        }
-
-        .line-legend-color.vertical {
-            background: var(--line-vertical-color);
-        }
-
-        .line-legend-color.horizontal {
-            background: var(--line-horizontal-color);
-        }
-
-        /* ========================================
-           FOOTER
-           ======================================== */
         footer {
             background: var(--bg-secondary);
             padding: 1.5rem 2rem;
@@ -864,27 +479,20 @@
             font-size: 0.875rem;
         }
 
-        /* ========================================
-           UTILIDADES
-           ======================================== */
-        .hidden {
-            display: none !important;
+        .coordinates-display {
+            position: fixed;
+            top: 80px;
+            right: 2rem;
+            background: var(--bg-card);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            z-index: 1000;
+            border: 1px solid var(--border-color);
         }
 
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
-        }
-
-        /* ========================================
-           RESPONSIVE DESIGN
-           ======================================== */
         @media (max-width: 768px) {
             header {
                 padding: 1rem;
@@ -908,42 +516,13 @@
                 justify-content: space-between;
             }
 
-            .control-buttons {
-                justify-content: center;
-            }
-
-            .image-actions {
-                flex-direction: column;
-            }
-
-            .image-actions-left {
-                justify-content: center;
-            }
-
-            .global-actions {
-                flex-direction: column;
-            }
-
-            .global-actions-buttons {
-                justify-content: center;
-            }
-
             .thumbnails-grid {
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
 
             .preview-wrapper {
                 min-height: 200px;
-                padding: 60px 20px;
-            }
-
-            .preview-wrapper.pan-enabled {
-                padding: 80px 30px;
-            }
-
-            .pan-hint {
-                font-size: 1rem;
-                padding: 1rem 1.5rem;
+                padding: 40px;
             }
 
             .input-sm {
@@ -956,230 +535,133 @@
             }
 
             .divider-line {
-                --line-width: 4px;
+                --line-width: 3px;
             }
 
-            /* Área táctil más grande en móvil */
-            .divider-line.vertical::before {
-                left: -20px;
-                right: -20px;
+            .zoom-controls {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.5rem;
             }
 
-            .divider-line.horizontal::before {
-                top: -20px;
-                bottom: -20px;
+            .coordinates-display {
+                top: auto;
+                bottom: 5rem;
+                right: 1rem;
+                font-size: 0.65rem;
             }
         }
     </style>
 </head>
 <body data-theme="light">
-    <!-- HEADER -->
     <header>
         <div class="header-content">
             <div class="header-title">
-                <h1>✂️ <span data-i18n="appTitle">Divisor de Imágenes</span></h1>
-                <p data-i18n="appSubtitle">Gratis • Privado • 100% Client-Side</p>
+                <h1>✂️ Divisor de Imágenes</h1>
+                <p>Gratis • Privado • 100% Client-Side</p>
             </div>
             <div class="header-actions">
-                <div class="header-settings">
-                    <select class="settings-select" id="langSelect" title="Language">
-                        <option value="es">🇪🇸 ES</option>
-                        <option value="en">🇬🇧 EN</option>
-                    </select>
-                    <select class="settings-select" id="themeSelect" title="Theme">
-                        <option value="light" data-i18n="themeLight">☀️ Claro</option>
-                        <option value="dark" data-i18n="themeDark">🌙 Oscuro</option>
-                        <option value="system" data-i18n="themeSystem">💻 Sistema</option>
-                    </select>
-                </div>
-                <button class="btn btn-secondary" id="helpBtn" data-i18n="helpBtn">❓ Ayuda</button>
-                <button class="btn btn-secondary" id="clearAllBtn" data-i18n="clearAllBtn">🗑️ Limpiar Todo</button>
+                <select class="input" id="themeSelect" title="Tema">
+                    <option value="light">☀️ Claro</option>
+                    <option value="dark">🌙 Oscuro</option>
+                </select>
+                <button class="btn btn-danger" id="clearAllBtn">🗑️ Limpiar Todo</button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main>
-        <!-- SECCIÓN DE CARGA -->
-        <section class="upload-section" id="uploadSection">
-            <h2 data-i18n="uploadTitle">📤 Cargar Imágenes</h2>
-            <p data-i18n="uploadDesc">Arrastra imágenes aquí o haz clic para seleccionar</p>
-            <p style="font-size: 0.75rem; color: var(--text-secondary);" data-i18n="uploadLimit">
-                Máximo 50 MB por imagen • Advertencia si >5 imágenes o >200 MB total
-            </p>
-            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
-            <button class="btn btn-primary" id="selectFilesBtn" data-i18n="selectFilesBtn">
-                📁 <span data-i18n="selectFilesText">Seleccionar Imágenes</span>
-            </button>
-        </section>
-
-        <!-- ALERTAS -->
         <div id="alertsContainer"></div>
 
-        <!-- ACCIONES GLOBALES -->
         <section class="global-actions hidden" id="globalActions">
-            <h2 data-i18n="globalActionsTitle">🌐 Acciones Globales</h2>
+            <h2>🌐 Acciones Globales</h2>
             <div class="global-actions-buttons">
-                <button class="btn btn-primary" id="downloadAllBtn" data-i18n="downloadAllBtn">📦 Descargar Todo (ZIP)</button>
-                <button class="btn btn-secondary" id="applyAllBtn" data-i18n="applyAllBtn">📋 Aplicar Config. a Todas</button>
+                <button class="btn btn-primary" id="downloadAllBtn">📦 Descargar Todas las Partes</button>
             </div>
         </section>
 
-        <!-- CONTENEDOR DE IMÁGENES -->
-        <section class="images-container" id="imagesContainer"></section>
+        <section class="upload-section" id="uploadSection">
+            <h2>📤 Cargar Imágenes</h2>
+            <p>Arrastra imágenes aquí o haz clic para seleccionar</p>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                Máximo 50 MB por imagen
+            </p>
+            <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+        </section>
+
+        <div id="imagesContainer"></div>
     </main>
 
-    <!-- FOOTER -->
+    <div class="zoom-controls hidden" id="zoomControls">
+        <button class="btn btn-sm" id="globalZoomOut">-</button>
+        <span class="zoom-level" id="globalZoomLevel">100%</span>
+        <button class="btn btn-sm" id="globalZoomIn">+</button>
+    </div>
+
+    <div class="pan-hint" id="panHint">💡 Arrastra para mover la imagen</div>
+
+    <div class="coordinates-display hidden" id="coordinatesDisplay">
+        Posición: 0%, 0%
+    </div>
+
     <footer>
-        <p data-i18n="footerText">
-            ✂️ Divisor de Imágenes Gratuito Online - Procesamiento 100% local, tus imágenes nunca salen de tu dispositivo.
+        <p>
+            ✂️ Divisor de Imágenes Gratuito - Procesamiento 100% local, tus imágenes nunca salen de tu dispositivo.
             <br>
-            Recomendado: Chrome/Firefox en desktop. Móvil/Safari puede tener limitaciones de tamaño.
+            Recomendado: Chrome/Firefox en desktop.
         </p>
     </footer>
 
-    <!-- MODAL DE TUTORIAL -->
-    <div class="modal-overlay hidden" id="tutorialModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 data-i18n="tutorialTitle">📖 Tutorial de Uso</h2>
-                <button class="modal-close" id="closeTutorial">&times;</button>
-            </div>
-            <div class="modal-body">
-                <h3 data-i18n="tutorialStep1Title">1️⃣ Cargar Imágenes</h3>
-                <ul>
-                    <li data-i18n="tutorialStep1Item1">Arrastra imágenes al área de carga o usa "Seleccionar Imágenes"</li>
-                    <li data-i18n="tutorialStep1Item2">Puedes cargar múltiples imágenes a la vez</li>
-                    <li data-i18n="tutorialStep1Item3">Límite: 50 MB por imagen</li>
-                </ul>
-
-                <h3 data-i18n="tutorialStep2Title">2️⃣ Configurar Divisiones</h3>
-                <ul>
-                    <li data-i18n="tutorialStep2Item1"><strong>Div. Vertical:</strong> Número de columnas (líneas azules)</li>
-                    <li data-i18n="tutorialStep2Item2"><strong>Div. Horizontal:</strong> Número de filas (líneas rojas)</li>
-                    <li data-i18n="tutorialStep2Item3">Las líneas se generan automáticamente al cambiar los números</li>
-                </ul>
-
-                <h3 data-i18n="tutorialStep3Title">3️⃣ Ajustar Líneas Manualmente</h3>
-                <ul>
-                    <li data-i18n="tutorialStep3Item1">Arrastra las líneas para ajustar posición exacta</li>
-                    <li data-i18n="tutorialStep3Item2">La vista previa se actualiza en tiempo real</li>
-                </ul>
-                
-                <div class="line-legend">
-                    <div class="line-legend-item">
-                        <div class="line-legend-color vertical"></div>
-                        <span>Líneas Verticales (Azul)</span>
-                    </div>
-                    <div class="line-legend-item">
-                        <div class="line-legend-color horizontal"></div>
-                        <span>Líneas Horizontales (Rojo)</span>
-                    </div>
-                </div>
-
-                <h3 data-i18n="tutorialStep4Title">4️⃣ Descargar</h3>
-                <ul>
-                    <li data-i18n="tutorialStep4Item1">Descarga partes individuales o todo en ZIP</li>
-                    <li data-i18n="tutorialStep4Item2">Usa "Descargar Todo" para todas las imágenes</li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="dontShowAgainBtn" data-i18n="dontShowAgainBtn">No mostrar de nuevo</button>
-                <button class="btn btn-primary" id="closeTutorialBtn" data-i18n="closeTutorialBtn">¡Entendido!</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        /* ========================================
-           SISTEMA DE TRADUCCIÓN
-           ======================================== */
-        const translations = {
-            es: {
-                title: "Divisor de Imágenes Gratuito Online",
-                appTitle: "Divisor de Imágenes",
-                appSubtitle: "Gratis • Privado • 100% Client-Side",
-                helpBtn: "❓ Ayuda",
-                clearAllBtn: "🗑️ Limpiar Todo",
-                uploadTitle: "📤 Cargar Imágenes",
-                uploadDesc: "Arrastra imágenes aquí o haz clic para seleccionar",
-                uploadLimit: "Máximo 50 MB por imagen • Advertencia si >5 imágenes o >200 MB total",
-                selectFilesBtn: "📁 Seleccionar Imágenes",
-                globalActionsTitle: "🌐 Acciones Globales",
-                downloadAllBtn: "📦 Descargar Todo (ZIP)",
-                applyAllBtn: "📋 Aplicar Config. a Todas",
-                themeLight: "☀️ Claro",
-                themeDark: "🌙 Oscuro",
-                themeSystem: "💻 Sistema",
-                divVertical: "Div. Vertical:",
-                divHorizontal: "Div. Horizontal:",
-                applyToAll: "Aplicar a todas",
-                previewTitle: "Vista Previa",
-                parts: "partes",
-                processing: "Procesando...",
-                downloadZip: "📦 Descargar ZIP",
-                downloadPart: "⬇️",
-                undo: "↩️",
-                redo: "↪️",
-                remove: "🗑️"
-            },
-            en: {
-                title: "Free Online Image Splitter",
-                appTitle: "Image Splitter",
-                appSubtitle: "Free • Private • 100% Client-Side",
-                helpBtn: "❓ Help",
-                clearAllBtn: "🗑️ Clear All",
-                uploadTitle: "📤 Upload Images",
-                uploadDesc: "Drag images here or click to select",
-                uploadLimit: "Max 50 MB per image • Warning if >5 images or >200 MB total",
-                selectFilesBtn: "📁 Select Images",
-                globalActionsTitle: "🌐 Global Actions",
-                downloadAllBtn: "📦 Download All (ZIP)",
-                applyAllBtn: "📋 Apply Config to All",
-                themeLight: "☀️ Light",
-                themeDark: "🌙 Dark",
-                themeSystem: "💻 System",
-                divVertical: "Div. Vertical:",
-                divHorizontal: "Div. Horizontal:",
-                applyToAll: "Apply to all",
-                previewTitle: "Preview",
-                parts: "parts",
-                processing: "Processing...",
-                downloadZip: "📦 Download ZIP",
-                downloadPart: "⬇️",
-                undo: "↩️",
-                redo: "↪️",
-                remove: "🗑️"
-            }
-        };
-
-        let currentLang = localStorage.getItem('imageSplitterLang') || 'es';
-        let currentTheme = localStorage.getItem('imageSplitterTheme') || 'light';
-
-        function applyTranslations(lang) {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) {
-                    el.innerHTML = translations[lang][key];
-                }
-            });
-        }
-
-        /* ========================================
-           ESTADO GLOBAL
-           ======================================== */
+        // ========================================
+        // ESTADO GLOBAL
+        // ========================================
         const AppState = {
             images: [],
             nextId: 1,
             maxFileSize: 50 * 1024 * 1024,
-            warningImageCount: 5,
-            warningTotalSize: 200 * 1024 * 1024,
-            maxDimension: 100000
+            globalZoom: 1
         };
 
-        /* ========================================
-           CLASE ImageData - CORREGIDA
-           ======================================== */
+        // ========================================
+        // FUNCIONES DE UTILIDAD
+        // ========================================
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertsContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            
+            let icon = 'ℹ️';
+            if (type === 'warning') icon = '⚠️';
+            if (type === 'danger') icon = '❌';
+            if (type === 'success') icon = '✅';
+            
+            alert.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+            
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+
+        function updateGlobalActions() {
+            const container = document.getElementById('globalActions');
+            const zoomControls = document.getElementById('zoomControls');
+            if (AppState.images.length > 0) {
+                container.classList.remove('hidden');
+                zoomControls.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+                zoomControls.classList.add('hidden');
+            }
+        }
+
+        // ========================================
+        // CLASE ImageData - PRECISIÓN 100% REAL
+        // ========================================
         class ImageData {
             constructor(file, id) {
                 this.id = id;
@@ -1189,22 +671,16 @@
                 
                 this.rows = 1;
                 this.cols = 1;
-                this.horizontalLines = [];  // Posiciones en % (0-100)
-                this.verticalLines = [];    // Posiciones en % (0-100)
+                this.horizontalLines = [];
+                this.verticalLines = [];
                 
                 this.zoom = 1;
                 this.isZoomed = false;
-                
-                this.history = [];
-                this.historyIndex = -1;
                 
                 this.isLoaded = false;
                 this.isLoading = false;
                 
                 this.elements = {};
-                
-                // Bandera para evitar actualizaciones innecesarias
-                this._isUpdatingPreviews = false;
                 
                 this.loadImage();
             }
@@ -1218,7 +694,7 @@
                     
                     await new Promise((resolve, reject) => {
                         img.onload = () => {
-                            if (img.width > AppState.maxDimension || img.height > AppState.maxDimension) {
+                            if (img.width > 100000 || img.height > 100000) {
                                 reject(new Error(`Imagen demasiado grande: ${img.width}x${img.height}px`));
                             } else {
                                 resolve();
@@ -1232,7 +708,6 @@
                     this.width = img.width;
                     this.height = img.height;
                     
-                    this.saveState();
                     this.isLoaded = true;
                     this.render();
                     
@@ -1244,86 +719,51 @@
                 }
             }
 
-            saveState() {
-                this.history = this.history.slice(0, this.historyIndex + 1);
-                this.history.push({
-                    rows: this.rows,
-                    cols: this.cols,
-                    horizontalLines: [...this.horizontalLines],
-                    verticalLines: [...this.verticalLines]
-                });
-                
-                if (this.history.length > 50) {
-                    this.history.shift();
+            // ALGORITMO DE PRECISIÓN 100% - LÍMITES COMPARTIDOS
+            getParts() {
+                const parts = [];
+
+                // Convertir porcentajes a posiciones de píxeles EXACTAS usando Math.round
+                const vLinesPx = this.verticalLines.map(p => Math.round((p / 100) * this.width));
+                const hLinesPx = this.horizontalLines.map(p => Math.round((p / 100) * this.height));
+
+                // Crear arrays de límites (posiciones de inicio y fin)
+                const vBoundaries = [0, ...vLinesPx, this.width];
+                const hBoundaries = [0, ...hLinesPx, this.height];
+
+                // Generar partes usando límites EXACTOS
+                for (let row = 0; row < hBoundaries.length - 1; row++) {
+                    for (let col = 0; col < vBoundaries.length - 1; col++) {
+                        parts.push({
+                            row: row + 1,
+                            col: col + 1,
+                            xPixel: vBoundaries[col],
+                            yPixel: hBoundaries[row],
+                            widthPixel: vBoundaries[col + 1] - vBoundaries[col],
+                            heightPixel: hBoundaries[row + 1] - hBoundaries[row]
+                        });
+                    }
                 }
-                
-                this.historyIndex = this.history.length - 1;
-                this.updateUndoRedoButtons();
+
+                return parts;
             }
 
-            undo() {
-                if (this.historyIndex > 0) {
-                    this.historyIndex--;
-                    this.restoreState(this.history[this.historyIndex]);
-                }
-            }
-
-            redo() {
-                if (this.historyIndex < this.history.length - 1) {
-                    this.historyIndex++;
-                    this.restoreState(this.history[this.historyIndex]);
-                }
-            }
-
-            restoreState(state) {
-                this.rows = state.rows;
-                this.cols = state.cols;
-                this.horizontalLines = [...state.horizontalLines];
-                this.verticalLines = [...state.verticalLines];
-                
-                this.updateInputs();
-                this.renderLines();
-                this.forceUpdatePreviews();
-                this.updateUndoRedoButtons();
-            }
-
-            /**
-             * GENERACIÓN AUTOMÁTICA DE LÍNEAS
-             * ================================
-             * Para N divisiones, generamos N-1 líneas uniformemente distribuidas.
-             * Ejemplo: 3 columnas → 2 líneas verticales en 33.33% y 66.67%
-             */
             generateAutoLines() {
-                this.rows = Math.max(1, Math.min(20, parseInt(this.elements.rowsInput?.value) || 1));
-                this.cols = Math.max(1, Math.min(20, parseInt(this.elements.colsInput?.value) || 1));
+                this.rows = parseInt(this.elements.rowsInput.value) || 1;
+                this.cols = parseInt(this.elements.colsInput.value) || 1;
                 
-                // Generar líneas horizontales (para filas)
                 this.horizontalLines = [];
                 for (let i = 1; i < this.rows; i++) {
                     this.horizontalLines.push((i / this.rows) * 100);
                 }
                 
-                // Generar líneas verticales (para columnas)
                 this.verticalLines = [];
                 for (let i = 1; i < this.cols; i++) {
                     this.verticalLines.push((i / this.cols) * 100);
                 }
                 
-                this.saveState();
                 this.renderLines();
-                this.forceUpdatePreviews();
-            }
-
-            applyConfig(source) {
-                this.rows = source.rows;
-                this.cols = source.cols;
-                this.horizontalLines = [...source.horizontalLines];
-                this.verticalLines = [...source.verticalLines];
-                
-                this.saveState();
-                this.updateInputs();
-                this.renderLines();
-                this.forceUpdatePreviews();
+                this.updatePreviews();
             }
 
             render() {
@@ -1334,35 +774,26 @@
                     document.getElementById('imagesContainer').appendChild(this.elements.container);
                 }
                 
-                const t = translations[currentLang];
+                const numParts = (this.horizontalLines.length + 1) * (this.verticalLines.length + 1);
                 
                 this.elements.container.innerHTML = `
                     <div class="image-controls">
-                        <div class="image-name">
-                            ${this.name}
-                            <span class="image-dimensions">(${this.width}×${this.height}px)</span>
+                        <div>
+                            <div class="image-name">
+                                ${this.name}
+                                <span class="image-dimensions">${this.width}×${this.height}px</span>
+                            </div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label">${t.divVertical}</label>
+                            <label class="control-label">Columnas:</label>
                             <input type="number" class="input input-sm cols-input" value="${this.cols}" min="1" max="20">
                         </div>
                         <div class="control-group">
-                            <label class="control-label">${t.divHorizontal}</label>
+                            <label class="control-label">Filas:</label>
                             <input type="number" class="input input-sm rows-input" value="${this.rows}" min="1" max="20">
                         </div>
-                        <div class="control-buttons">
-                            <div class="switch-container">
-                                <label class="switch">
-                                    <input type="checkbox" class="apply-all-toggle">
-                                    <span class="switch-slider"></span>
-                                </label>
-                                <span class="control-label">${t.applyToAll}</span>
-                            </div>
-                        </div>
-                        <div class="control-buttons">
-                            <button class="btn btn-sm btn-secondary undo-btn" disabled>${t.undo}</button>
-                            <button class="btn btn-sm btn-secondary redo-btn" disabled>${t.redo}</button>
-                            <button class="btn btn-sm btn-danger remove-btn">${t.remove}</button>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button class="btn btn-sm btn-danger remove-btn">🗑️</button>
                         </div>
                     </div>
                     <div class="preview-container">
@@ -1370,54 +801,31 @@
                             <div class="preview-canvas-container" id="canvas-container-${this.id}">
                                 <canvas class="preview-canvas" id="canvas-${this.id}"></canvas>
                             </div>
-                            <div class="zoom-controls">
-                                <button class="btn btn-sm btn-secondary zoom-out">−</button>
-                                <span class="zoom-level">100%</span>
-                                <button class="btn btn-sm btn-secondary zoom-in">+</button>
-                            </div>
-                            <div class="pan-hint" id="pan-hint-${this.id}">💡 Arrastra para mover</div>
                         </div>
                     </div>
                     <div class="preview-thumbnails">
-                        <div class="preview-thumbnails-header">
-                            <h3>${t.previewTitle} (<span class="parts-count">${this.rows * this.cols}</span> ${t.parts})</h3>
-                        </div>
+                        <h3>Vista Previa (${numParts} partes)</h3>
                         <div class="thumbnails-grid" id="thumbnails-${this.id}"></div>
                     </div>
                     <div class="image-actions">
-                        <div class="image-actions-left">
-                            <button class="btn btn-success download-zip-btn">${t.downloadZip}</button>
-                        </div>
-                        <div class="progress-container hidden" id="progress-${this.id}">
-                            <div class="spinner"></div>
-                            <span>${t.processing}</span>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button class="btn btn-success download-all-btn">⬇️ Descargar Todo</button>
                         </div>
                     </div>
                 `;
                 
-                // Guardar referencias a elementos
                 this.elements.rowsInput = this.elements.container.querySelector('.rows-input');
                 this.elements.colsInput = this.elements.container.querySelector('.cols-input');
-                this.elements.applyAllToggle = this.elements.container.querySelector('.apply-all-toggle');
-                this.elements.undoBtn = this.elements.container.querySelector('.undo-btn');
-                this.elements.redoBtn = this.elements.container.querySelector('.redo-btn');
                 this.elements.removeBtn = this.elements.container.querySelector('.remove-btn');
-                this.elements.downloadZipBtn = this.elements.container.querySelector('.download-zip-btn');
+                this.elements.downloadAllBtn = this.elements.container.querySelector('.download-all-btn');
                 this.elements.canvas = this.elements.container.querySelector(`#canvas-${this.id}`);
                 this.elements.canvasContainer = this.elements.container.querySelector(`#canvas-container-${this.id}`);
                 this.elements.previewWrapper = this.elements.container.querySelector(`#preview-wrapper-${this.id}`);
                 this.elements.thumbnailsContainer = this.elements.container.querySelector(`#thumbnails-${this.id}`);
-                this.elements.partsCount = this.elements.container.querySelector('.parts-count');
-                this.elements.progressContainer = this.elements.container.querySelector(`#progress-${this.id}`);
-                this.elements.zoomIn = this.elements.container.querySelector('.zoom-in');
-                this.elements.zoomOut = this.elements.container.querySelector('.zoom-out');
-                this.elements.zoomLevel = this.elements.container.querySelector('.zoom-level');
-                this.elements.panHint = this.elements.container.querySelector(`#pan-hint-${this.id}`);
                 
                 this.attachEventListeners();
                 this.drawCanvas();
-                this.renderLines();
-                this.forceUpdatePreviews();
+                this.updatePreviews();
             }
 
             renderLoading() {
@@ -1428,54 +836,33 @@
                 }
                 this.elements.container.innerHTML = `
                     <div style="padding: 2rem; text-align: center;">
-                        <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div>
+                        <div style="width: 40px; height: 40px; margin: 0 auto 1rem; border: 3px solid var(--border-color); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
                         <p>Cargando ${this.name}...</p>
                     </div>
                 `;
             }
 
             renderError(message) {
-                if (this.elements.container) {
-                    this.elements.container.innerHTML = `
-                        <div class="alert alert-danger" style="margin: 0;">
-                            <span>❌</span>
-                            <div>
-                                <strong>Error:</strong> ${this.name}
-                                <p>${message}</p>
-                            </div>
-                        </div>
-                    `;
+                if (!this.elements.container) {
+                    this.elements.container = document.createElement('div');
+                    this.elements.container.className = 'image-section';
+                    document.getElementById('imagesContainer').appendChild(this.elements.container);
                 }
+                this.elements.container.innerHTML = `
+                    <div class="alert alert-danger" style="margin: 0;">
+                        <span>❌</span>
+                        <div>
+                            <strong>Error:</strong> ${this.name}
+                            <p>${message}</p>
+                        </div>
+                    </div>
+                `;
             }
 
             attachEventListeners() {
-                // Inputs de filas/columnas
-                this.elements.rowsInput.addEventListener('change', () => this.generateAutoLines());
-                this.elements.colsInput.addEventListener('change', () => this.generateAutoLines());
+                this.elements.rowsInput.addEventListener('input', () => this.generateAutoLines());
+                this.elements.colsInput.addEventListener('input', () => this.generateAutoLines());
                 
-                // También en input para actualizaciones más rápidas
-                this.elements.rowsInput.addEventListener('input', () => {
-                    clearTimeout(this._inputDebounce);
-                    this._inputDebounce = setTimeout(() => this.generateAutoLines(), 300);
-                });
-                this.elements.colsInput.addEventListener('input', () => {
-                    clearTimeout(this._inputDebounce);
-                    this._inputDebounce = setTimeout(() => this.generateAutoLines(), 300);
-                });
-                
-                // Aplicar a todas
-                this.elements.applyAllToggle.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        this.applyConfigToAll();
-                        e.target.checked = false;
-                    }
-                });
-                
-                // Undo/Redo
-                this.elements.undoBtn.addEventListener('click', () => this.undo());
-                this.elements.redoBtn.addEventListener('click', () => this.redo());
-                
-                // Eliminar
                 this.elements.removeBtn.addEventListener('click', () => {
                     this.dispose();
                     AppState.images = AppState.images.filter(img => img.id !== this.id);
@@ -1483,94 +870,41 @@
                     updateGlobalActions();
                 });
                 
-                // Descargar ZIP
-                this.elements.downloadZipBtn.addEventListener('click', () => this.downloadZip());
-                
-                // Zoom
-                this.elements.zoomIn.addEventListener('click', () => this.zoomIn());
-                this.elements.zoomOut.addEventListener('click', () => this.zoomOut());
-                
-                // Pan
-                this.initPan();
-            }
-
-            initPan() {
-                const wrapper = this.elements.previewWrapper;
-                let isPanning = false;
-                let startX, startY, scrollLeft, scrollTop;
-
-                const startPan = (e) => {
-                    if (!this.isZoomed) return;
-                    if (e.target.classList.contains('divider-line')) return;
-                    
-                    isPanning = true;
-                    startX = e.clientX || e.touches[0].clientX;
-                    startY = e.clientY || e.touches[0].clientY;
-                    scrollLeft = wrapper.scrollLeft;
-                    scrollTop = wrapper.scrollTop;
-                    this.elements.panHint.classList.remove('visible');
-                };
-
-                const movePan = (e) => {
-                    if (!isPanning) return;
-                    e.preventDefault();
-                    
-                    const x = e.clientX || (e.touches?.[0]?.clientX ?? 0);
-                    const y = e.clientY || (e.touches?.[0]?.clientY ?? 0);
-                    
-                    wrapper.scrollLeft = scrollLeft - (x - startX);
-                    wrapper.scrollTop = scrollTop - (y - startY);
-                };
-
-                const endPan = () => {
-                    isPanning = false;
-                };
-
-                wrapper.addEventListener('mousedown', startPan);
-                wrapper.addEventListener('touchstart', startPan, { passive: false });
-                document.addEventListener('mousemove', movePan);
-                document.addEventListener('touchmove', movePan, { passive: false });
-                document.addEventListener('mouseup', endPan);
-                document.addEventListener('touchend', endPan);
-            }
-
-            applyConfigToAll() {
-                AppState.images.forEach(img => {
-                    if (img.id !== this.id && img.isLoaded) {
-                        img.applyConfig(this);
-                    }
+                this.elements.downloadAllBtn.addEventListener('click', () => {
+                    this.downloadAll();
                 });
-                showAlert('✅ Configuración aplicada a todas las imágenes', 'success');
+                
+                this.initDraggableLines();
+            }
+
+            // CRÍTICO: Establecer las dimensiones del contenedor para que coincidan con el canvas real
+            setCanvasContainerSize() {
+                if (!this.elements.canvasContainer || !this.elements.canvas) return;
+                
+                // El contenedor debe tener exactamente las mismas dimensiones que el canvas real
+                this.elements.canvasContainer.style.width = this.width + 'px';
+                this.elements.canvasContainer.style.height = this.height + 'px';
             }
 
             drawCanvas() {
                 if (!this.image || !this.elements.canvas) return;
                 
-                try {
-                    const canvas = this.elements.canvas;
-                    canvas.width = this.width;
-                    canvas.height = this.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(this.image, 0, 0);
-                } catch (error) {
-                    console.error('Error dibujando canvas:', error);
-                    showAlert(`Error al dibujar ${this.name}`, 'danger');
-                }
+                const canvas = this.elements.canvas;
+                canvas.width = this.width;
+                canvas.height = this.height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(this.image, 0, 0);
+                
+                // CRÍTICO: Después de dibujar, establecer las dimensiones del contenedor
+                this.setCanvasContainerSize();
             }
 
-            /**
-             * RENDERIZAR LÍNEAS DIVISORAS
-             * ============================
-             * Las líneas se posicionan usando porcentajes CSS,
-             * lo que garantiza precisión independiente del zoom.
-             */
             renderLines() {
                 if (!this.elements.canvasContainer) return;
                 
-                // Limpiar líneas existentes
                 this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(el => el.remove());
                 
-                // Crear líneas verticales (azules)
                 this.verticalLines.forEach((pos, index) => {
                     const line = document.createElement('div');
                     line.className = 'divider-line vertical';
@@ -1580,7 +914,6 @@
                     this.elements.canvasContainer.appendChild(line);
                 });
                 
-                // Crear líneas horizontales (rojas)
                 this.horizontalLines.forEach((pos, index) => {
                     const line = document.createElement('div');
                     line.className = 'divider-line horizontal';
@@ -1589,47 +922,37 @@
                     line.dataset.index = index;
                     this.elements.canvasContainer.appendChild(line);
                 });
-                
-                // Inicializar arrastre de líneas
-                this.initDraggableLines();
             }
 
-            /**
-             * ARRASTRE DE LÍNEAS - PRECISIÓN 100%
-             * ===================================
-             * CLAVE: Usamos el tamaño ORIGINAL del canvas (this.width, this.height)
-             * para calcular porcentajes, NO el tamaño visual (getBoundingClientRect).
-             * 
-             * Esto garantiza que las líneas estén exactamente donde el usuario las pone,
-             * independientemente del zoom aplicado.
-             */
             initDraggableLines() {
+                if (!this.elements.canvasContainer) return;
+                
                 const lines = this.elements.canvasContainer.querySelectorAll('.divider-line');
                 
                 lines.forEach(line => {
                     let isDragging = false;
-                    let startClientPos = 0;
-                    let startLinePercent = 0;
+                    let startPos = 0;
+                    let startX = 0;
+                    let startY = 0;
                     
                     const type = line.dataset.type;
                     const index = parseInt(line.dataset.index);
                     
                     const onDragStart = (e) => {
                         e.preventDefault();
-                        e.stopPropagation();
                         isDragging = true;
                         line.classList.add('dragging');
                         
                         const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                         const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                         
-                        // Guardar posición inicial del cursor
-                        startClientPos = type === 'vertical' ? clientX : clientY;
+                        startPos = type === 'vertical' ? this.verticalLines[index] : this.horizontalLines[index];
+                        startX = clientX;
+                        startY = clientY;
                         
-                        // Guardar posición inicial de la línea (en porcentaje)
-                        startLinePercent = type === 'vertical' 
-                            ? this.verticalLines[index] 
-                            : this.horizontalLines[index];
+                        // Mostrar hint de arrastre
+                        document.getElementById('panHint').textContent = '💡 Arrastrando línea...';
+                        document.getElementById('panHint').classList.add('visible');
                     };
                     
                     const onDragMove = (e) => {
@@ -1639,268 +962,163 @@
                         const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                         const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                         
-                        /**
-                         * CÁLCULO DE PRECISIÓN 100%
-                         * ==========================
-                         * 1. Obtenemos el rect del canvas para conocer su tamaño VISUAL actual
-                         * 2. Calculamos el delta del movimiento del cursor en píxeles
-                         * 3. Convertimos ese delta a porcentaje usando el tamaño VISUAL
-                         * 4. Aplicamos el delta al porcentaje inicial
-                         * 
-                         * Esto funciona porque:
-                         * - El porcentaje siempre es relativo al tamaño original
-                         * - El delta visual se convierte correctamente a porcentaje
-                         */
-                        const rect = this.elements.canvas.getBoundingClientRect();
+                        // CRÍTICO: Usar el contenedor del canvas para obtener las dimensiones reales
+                        const rect = this.elements.canvasContainer.getBoundingClientRect();
                         
-                        let newPercent;
+                        // Calcular el factor de escala entre el contenedor visual y el canvas real
+                        // El canvasContainer tiene las dimensiones del canvas real gracias a setCanvasContainerSize()
+                        // Pero visualmente puede estar escalado por el zoom o por el contenedor padre
+                        const scaleX = this.width / rect.width;
+                        const scaleY = this.height / rect.height;
+                        
+                        let newPos;
                         
                         if (type === 'vertical') {
-                            const currentClientPos = clientX;
-                            const deltaPx = currentClientPos - startClientPos;
-                            // Convertir delta en píxeles visuales a porcentaje
-                            const deltaPercent = (deltaPx / rect.width) * 100;
-                            newPercent = startLinePercent + deltaPercent;
+                            // Posición del mouse relativa al contenedor
+                            const relativeX = clientX - rect.left;
+                            // Convertir a posición real del canvas
+                            const realX = relativeX * scaleX;
+                            // Convertir a porcentaje del canvas real
+                            newPos = (realX / this.width) * 100;
+                            // Limitar entre 1% y 99%
+                            newPos = Math.max(1, Math.min(99, newPos));
+                            this.verticalLines[index] = newPos;
                         } else {
-                            const currentClientPos = clientY;
-                            const deltaPx = currentClientPos - startClientPos;
-                            // Convertir delta en píxeles visuales a porcentaje
-                            const deltaPercent = (deltaPx / rect.height) * 100;
-                            newPercent = startLinePercent + deltaPercent;
+                            // Posición del mouse relativa al contenedor
+                            const relativeY = clientY - rect.top;
+                            // Convertir a posición real del canvas
+                            const realY = relativeY * scaleY;
+                            // Convertir a porcentaje del canvas real
+                            newPos = (realY / this.height) * 100;
+                            // Limitar entre 1% y 99%
+                            newPos = Math.max(1, Math.min(99, newPos));
+                            this.horizontalLines[index] = newPos;
                         }
                         
-                        // Limitar entre 0.5% y 99.5%
-                        newPercent = Math.max(0.5, Math.min(99.5, newPercent));
-                        
-                        // Actualizar array de líneas
+                        // Actualizar posición visual de la línea
                         if (type === 'vertical') {
-                            this.verticalLines[index] = newPercent;
-                            line.style.left = `${newPercent}%`;
+                            line.style.left = `${newPos}%`;
                         } else {
-                            this.horizontalLines[index] = newPercent;
-                            line.style.top = `${newPercent}%`;
+                            line.style.top = `${newPos}%`;
                         }
                         
-                        // Actualizar contador de partes
-                        this.updatePartsCount();
-                        
-                        // Actualizar previews en tiempo real (con throttle)
-                        this.throttledUpdatePreviews();
+                        // Actualizar display de coordenadas
+                        const coordsDisplay = document.getElementById('coordinatesDisplay');
+                        if (coordsDisplay) {
+                            coordsDisplay.textContent = `Línea: ${newPos.toFixed(2)}%`;
+                        }
                     };
                     
                     const onDragEnd = () => {
                         if (isDragging) {
                             isDragging = false;
                             line.classList.remove('dragging');
-                            this.saveState();
-                            // Actualización final
-                            this.forceUpdatePreviews();
+                            this.updatePreviews();
+                            document.getElementById('panHint').classList.remove('visible');
                         }
                     };
                     
-                    // Event listeners
                     line.addEventListener('mousedown', onDragStart);
                     line.addEventListener('touchstart', onDragStart, { passive: false });
                     
-                    // Guardamos referencias para poder limpiar después
-                    line._onDragMove = onDragMove;
-                    line._onDragEnd = onDragEnd;
-                    
                     document.addEventListener('mousemove', onDragMove);
-                    document.addEventListener('mouseup', onDragEnd);
                     document.addEventListener('touchmove', onDragMove, { passive: false });
+                    
+                    document.addEventListener('mouseup', onDragEnd);
                     document.addEventListener('touchend', onDragEnd);
                 });
             }
 
-            updatePartsCount() {
-                if (this.elements.partsCount) {
-                    const count = (this.horizontalLines.length + 1) * (this.verticalLines.length + 1);
-                    this.elements.partsCount.textContent = count;
-                }
-            }
-
-            updateInputs() {
-                if (this.elements.rowsInput) this.elements.rowsInput.value = this.rows;
-                if (this.elements.colsInput) this.elements.colsInput.value = this.cols;
-            }
-
-            updateUndoRedoButtons() {
-                if (this.elements.undoBtn) {
-                    this.elements.undoBtn.disabled = this.historyIndex <= 0;
-                }
-                if (this.elements.redoBtn) {
-                    this.elements.redoBtn.disabled = this.historyIndex >= this.history.length - 1;
-                }
-            }
-
-            zoomIn() {
-                this.zoom = Math.min(5, this.zoom + 0.25);
-                this.updateZoom();
-            }
-
-            zoomOut() {
-                this.zoom = Math.max(0.5, this.zoom - 0.25);
-                this.updateZoom();
-            }
-
-            updateZoom() {
-                this.isZoomed = this.zoom !== 1;
-                this.elements.canvas.style.transform = `scale(${this.zoom})`;
-                this.elements.canvas.style.transformOrigin = 'top left';
-                this.elements.previewWrapper.classList.toggle('pan-enabled', this.isZoomed);
-                this.elements.zoomLevel.textContent = `${Math.round(this.zoom * 100)}%`;
-                
-                if (this.isZoomed) {
-                    this.elements.panHint.classList.add('visible');
-                    setTimeout(() => this.elements.panHint.classList.remove('visible'), 2000);
-                }
-            }
-
-            /**
-             * THROTTLED UPDATE PREVIEWS
-             * ==========================
-             * Limita las actualizaciones durante el arrastre para mejor rendimiento.
-             */
-            throttledUpdatePreviews() {
-                if (this._throttleTimeout) return;
-                
-                this._throttleTimeout = setTimeout(() => {
-                    this._throttleTimeout = null;
-                    this.forceUpdatePreviews();
-                }, 100); // Actualizar cada 100ms máximo durante arrastre
-            }
-
-            /**
-             * FORZAR ACTUALIZACIÓN DE PREVIEWS
-             * =================================
-             * Siempre reconstruye los thumbnails con las posiciones actuales.
-             */
-            forceUpdatePreviews() {
-                if (!this.elements.thumbnailsContainer || !this.image) return;
+            updatePreviews() {
+                if (!this.elements.thumbnailsContainer) return;
                 
                 const parts = this.getParts();
-                const t = translations[currentLang];
-                
-                // Actualizar contador
-                this.updatePartsCount();
-                
-                // Limpiar thumbnails existentes
-                this.elements.thumbnailsContainer.innerHTML = '';
-                
-                // Crear nuevos thumbnails
-                parts.forEach((part, index) => {
-                    const thumbnail = document.createElement('div');
-                    thumbnail.className = 'thumbnail-item';
-                    
-                    const label = `Parte ${part.row}-${part.col}`;
-                    
-                    thumbnail.innerHTML = `
-                        <canvas class="thumbnail-image" id="thumb-${this.id}-${index}"></canvas>
-                        <div class="thumbnail-info">
-                            <div class="thumbnail-label">${label}</div>
-                            <div class="thumbnail-dimensions">${part.widthPx}×${part.heightPx}px</div>
-                            <div class="thumbnail-actions">
-                                <button class="btn btn-sm btn-secondary download-part-btn" data-index="${index}">${t.downloadPart}</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    this.elements.thumbnailsContainer.appendChild(thumbnail);
-                    
-                    // Renderizar thumbnail
-                    this.renderThumbnail(part, index);
-                });
-                
-                // Event listeners para descargar partes
-                this.elements.thumbnailsContainer.querySelectorAll('.download-part-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const index = parseInt(e.target.dataset.index);
-                        this.downloadPart(parts[index]);
-                    });
-                });
-            }
-
-            /**
-             * OBTENER PARTES CON PRECISIÓN 100%
-             * ==================================
-             * Calcula las coordenadas exactas en píxeles para cada parte.
-             */
-            getParts() {
-                const parts = [];
-                
-                // Añadir bordes (0 y 100%) y ordenar
-                const vLines = [0, ...this.verticalLines.slice().sort((a, b) => a - b), 100];
-                const hLines = [0, ...this.horizontalLines.slice().sort((a, b) => a - b), 100];
-                
-                for (let row = 0; row < hLines.length - 1; row++) {
-                    for (let col = 0; col < vLines.length - 1; col++) {
-                        const xPercent = vLines[col];
-                        const yPercent = hLines[row];
-                        const widthPercent = vLines[col + 1] - vLines[col];
-                        const heightPercent = hLines[row + 1] - hLines[row];
-                        
-                        // Convertir porcentajes a píxeles exactos
-                        const xPx = Math.round((xPercent / 100) * this.width);
-                        const yPx = Math.round((yPercent / 100) * this.height);
-                        const widthPx = Math.round((widthPercent / 100) * this.width);
-                        const heightPx = Math.round((heightPercent / 100) * this.height);
-                        
-                        parts.push({
-                            row: row + 1,
-                            col: col + 1,
-                            xPx,
-                            yPx,
-                            widthPx,
-                            heightPx
-                        });
-                    }
+                const numParts = (this.horizontalLines.length + 1) * (this.verticalLines.length + 1);
+                const title = this.elements.thumbnailsContainer.querySelector('h3');
+                if (title) {
+                    title.textContent = `Vista Previa (${numParts} partes)`;
                 }
                 
-                return parts;
+                const currentThumbnails = this.elements.thumbnailsContainer.querySelectorAll('.thumbnail-item').length;
+                
+                if (currentThumbnails !== numParts) {
+                    this.elements.thumbnailsContainer.innerHTML = '';
+                    
+                    parts.forEach((part, index) => {
+                        const thumbnail = document.createElement('div');
+                        thumbnail.className = 'thumbnail-item';
+                        
+                        const label = `parte-${part.row}-${part.col}`;
+                        
+                        thumbnail.innerHTML = `
+                            <canvas class="thumbnail-image" id="thumb-${this.id}-${index}"></canvas>
+                            <div class="thumbnail-info">
+                                <div class="thumbnail-label">${label}</div>
+                                <div style="font-size: 0.65rem; color: var(--text-secondary);">
+                                    ${part.widthPixel}×${part.heightPixel}px
+                                </div>
+                                <div class="thumbnail-actions">
+                                    <button class="btn btn-sm download-part-btn" data-index="${index}">⬇️</button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        this.elements.thumbnailsContainer.appendChild(thumbnail);
+                        
+                        this.renderThumbnail(part, index);
+                    });
+                    
+                    this.elements.thumbnailsContainer.querySelectorAll('.download-part-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const index = parseInt(e.target.dataset.index);
+                            this.downloadPart(parts[index]);
+                        });
+                    });
+                }
             }
 
             renderThumbnail(part, index) {
                 const canvas = document.getElementById(`thumb-${this.id}-${index}`);
-                if (!canvas || !this.image) return;
+                if (!canvas) return;
                 
-                try {
-                    const maxSize = 120;
-                    const scale = Math.min(maxSize / part.widthPx, maxSize / part.heightPx, 1);
-                    
-                    canvas.width = Math.max(1, part.widthPx * scale);
-                    canvas.height = Math.max(1, part.heightPx * scale);
-                    
-                    const ctx = canvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-                    
-                    // Dibujar la porción exacta de la imagen
-                    ctx.drawImage(
-                        this.image,
-                        part.xPx, part.yPx, part.widthPx, part.heightPx,
-                        0, 0, canvas.width, canvas.height
-                    );
-                } catch (error) {
-                    console.error('Error renderizando thumbnail:', error);
-                }
+                const maxSize = 150;
+                const scale = Math.min(maxSize / part.widthPixel, maxSize / part.heightPixel, 1);
+                
+                canvas.width = part.widthPixel * scale;
+                canvas.height = part.heightPixel * scale;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                
+                // Dibujar usando píxeles EXACTOS
+                ctx.drawImage(
+                    this.image,
+                    part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
+                    0, 0, canvas.width, canvas.height
+                );
             }
 
             downloadPart(part) {
                 try {
                     const canvas = document.createElement('canvas');
-                    canvas.width = part.widthPx;
-                    canvas.height = part.heightPx;
+                    canvas.width = part.widthPixel;
+                    canvas.height = part.heightPixel;
                     
                     const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    
+                    // Dibujar usando píxeles EXACTOS
                     ctx.drawImage(
                         this.image,
-                        part.xPx, part.yPx, part.widthPx, part.heightPx,
-                        0, 0, part.widthPx, part.heightPx
+                        part.xPixel, part.yPixel, part.widthPixel, part.heightPixel,
+                        0, 0, part.widthPixel, part.heightPixel
                     );
                     
+                    const label = `parte-${part.row}-${part.col}`;
                     const baseName = this.name.replace(/\.[^/.]+$/, '');
-                    const filename = `${baseName}-parte-${part.row}-${part.col}.png`;
+                    const filename = `${baseName}-${label}.png`;
                     
                     canvas.toBlob(blob => {
                         const url = URL.createObjectURL(blob);
@@ -1910,73 +1128,38 @@
                         a.click();
                         URL.revokeObjectURL(url);
                     }, 'image/png');
+                    
                 } catch (error) {
                     console.error('Error descargando parte:', error);
-                    showAlert('Error al descargar la parte', 'danger');
+                    showAlert('Error al descargar la parte.', 'danger');
                 }
             }
 
-            async downloadZip() {
-                this.elements.progressContainer.classList.remove('hidden');
-                this.elements.downloadZipBtn.disabled = true;
+            async downloadAll() {
+                const parts = this.getParts();
                 
-                try {
-                    const parts = this.getParts();
-                    const zip = new JSZip();
-                    const baseName = this.name.replace(/\.[^/.]+$/, '');
-                    
-                    for (const part of parts) {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = part.widthPx;
-                        canvas.height = part.heightPx;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(
-                            this.image,
-                            part.xPx, part.yPx, part.widthPx, part.heightPx,
-                            0, 0, part.widthPx, part.heightPx
-                        );
-                        
-                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                        zip.file(`${baseName}-parte-${part.row}-${part.col}.png`, blob);
-                    }
-                    
-                    const content = await zip.generateAsync({ type: 'blob' });
-                    const url = URL.createObjectURL(content);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${baseName}-partes.zip`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    
-                    showAlert(`✅ ZIP descargado: ${parts.length} partes`, 'success');
-                } catch (error) {
-                    console.error('Error generando ZIP:', error);
-                    showAlert('Error al generar ZIP', 'danger');
-                } finally {
-                    this.elements.progressContainer.classList.add('hidden');
-                    this.elements.downloadZipBtn.disabled = false;
+                showAlert(`Descargando ${parts.length} partes...`, 'info');
+                
+                for (let i = 0; i < parts.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    this.downloadPart(parts[i]);
+                }
+                
+                showAlert(`✅ ${parts.length} partes descargadas`, 'success');
+            }
+
+            setZoom(zoom) {
+                this.zoom = zoom;
+                this.isZoomed = zoom !== 1;
+                
+                if (this.elements.canvas) {
+                    this.elements.canvas.style.transform = `scale(${zoom})`;
                 }
             }
 
             dispose() {
-                // Limpiar event listeners de líneas
-                if (this.elements.canvasContainer) {
-                    this.elements.canvasContainer.querySelectorAll('.divider-line').forEach(line => {
-                        if (line._onDragMove) {
-                            document.removeEventListener('mousemove', line._onDragMove);
-                            document.removeEventListener('touchmove', line._onDragMove);
-                        }
-                        if (line._onDragEnd) {
-                            document.removeEventListener('mouseup', line._onDragEnd);
-                            document.removeEventListener('touchend', line._onDragEnd);
-                        }
-                    });
-                }
-                
-                // Liberar memoria
                 if (this.image) {
-                    URL.revokeObjectURL(this.image.src);
+                    this.image.src = '';
                     this.image = null;
                 }
                 
@@ -1989,113 +1172,48 @@
             }
         }
 
-        /* ========================================
-           FUNCIONES DE UTILIDAD
-           ======================================== */
-
-        function showAlert(message, type = 'info') {
-            const container = document.getElementById('alertsContainer');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
+        // ========================================
+        // ZOOM GLOBAL
+        // ========================================
+        function setGlobalZoom(zoom) {
+            AppState.globalZoom = zoom;
             
-            const icons = { info: 'ℹ️', warning: '⚠️', danger: '❌', success: '✅' };
-            
-            alert.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
-            container.appendChild(alert);
-            
-            setTimeout(() => {
-                alert.style.opacity = '0';
-                alert.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => alert.remove(), 300);
-            }, 4000);
-        }
-
-        function updateGlobalActions() {
-            const container = document.getElementById('globalActions');
-            container.classList.toggle('hidden', AppState.images.length === 0);
-        }
-
-        async function downloadAll() {
-            const loadedImages = AppState.images.filter(img => img.isLoaded);
-            if (loadedImages.length === 0) {
-                showAlert('No hay imágenes cargadas', 'warning');
-                return;
-            }
-            
-            try {
-                const zip = new JSZip();
-                let totalParts = 0;
-                
-                for (let i = 0; i < loadedImages.length; i++) {
-                    const img = loadedImages[i];
-                    const parts = img.getParts();
-                    const baseName = `imagen${i + 1}-${img.name.replace(/\.[^/.]+$/, '')}`;
-                    
-                    for (const part of parts) {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = part.widthPx;
-                        canvas.height = part.heightPx;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(
-                            img.image,
-                            part.xPx, part.yPx, part.widthPx, part.heightPx,
-                            0, 0, part.widthPx, part.heightPx
-                        );
-                        
-                        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                        zip.file(`${baseName}-parte-${part.row}-${part.col}.png`, blob);
-                        totalParts++;
-                    }
+            // Aplicar zoom a todas las imágenes
+            AppState.images.forEach(img => {
+                if (img.isLoaded) {
+                    img.setZoom(zoom);
                 }
-                
-                const content = await zip.generateAsync({ type: 'blob' });
-                const url = URL.createObjectURL(content);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'todas-imagenes-divididas.zip';
-                a.click();
-                URL.revokeObjectURL(url);
-                
-                showAlert(`✅ ZIP descargado: ${loadedImages.length} imágenes, ${totalParts} partes`, 'success');
-            } catch (error) {
-                console.error('Error generando ZIP global:', error);
-                showAlert('Error al generar ZIP global', 'danger');
+            });
+            
+            document.getElementById('globalZoomLevel').textContent = `${Math.round(zoom * 100)}%`;
+            
+            // Mostrar/ocultar hint de pan
+            const panHint = document.getElementById('panHint');
+            if (zoom !== 1) {
+                panHint.textContent = '💡 Arrastra para mover la imagen';
+                panHint.classList.add('visible');
+                setTimeout(() => panHint.classList.remove('visible'), 3000);
             }
         }
 
-        function applyConfigToAll() {
-            const firstImage = AppState.images.find(img => img.isLoaded);
-            if (firstImage) {
-                firstImage.applyConfigToAll();
-            } else {
-                showAlert('No hay imágenes cargadas', 'warning');
-            }
-        }
+        document.getElementById('globalZoomIn').addEventListener('click', () => {
+            const newZoom = Math.min(5, AppState.globalZoom + 0.25);
+            setGlobalZoom(newZoom);
+        });
 
-        function clearAll() {
-            if (!confirm('¿Eliminar todas las imágenes?')) return;
-            
-            AppState.images.forEach(img => img.dispose());
-            AppState.images = [];
-            AppState.nextId = 1;
-            
-            document.getElementById('imagesContainer').innerHTML = '';
-            document.getElementById('alertsContainer').innerHTML = '';
-            updateGlobalActions();
-            
-            showAlert('🗑️ Todas las imágenes eliminadas', 'info');
-        }
+        document.getElementById('globalZoomOut').addEventListener('click', () => {
+            const newZoom = Math.max(0.5, AppState.globalZoom - 0.25);
+            setGlobalZoom(newZoom);
+        });
 
-        /* ========================================
-           EVENT LISTENERS GLOBALES
-           ======================================== */
-
+        // ========================================
+        // EVENT LISTENERS GLOBALES
+        // ========================================
         const fileInput = document.getElementById('fileInput');
         const uploadSection = document.getElementById('uploadSection');
-        const selectFilesBtn = document.getElementById('selectFilesBtn');
 
-        selectFilesBtn.addEventListener('click', () => fileInput.click());
+        uploadSection.addEventListener('click', () => fileInput.click());
+
         fileInput.addEventListener('change', handleFiles);
 
         uploadSection.addEventListener('dragover', (e) => {
@@ -2110,6 +1228,7 @@
         uploadSection.addEventListener('drop', (e) => {
             e.preventDefault();
             uploadSection.classList.remove('dragover');
+            
             const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
             processFiles(files);
         });
@@ -2125,18 +1244,8 @@
             
             const oversizedFiles = files.filter(f => f.size > AppState.maxFileSize);
             if (oversizedFiles.length > 0) {
-                showAlert(`❌ ${oversizedFiles.length} archivo(s) exceden 50 MB`, 'danger');
+                showAlert(`❌ ${oversizedFiles.length} archivo(s) exceden el límite de 50 MB`, 'danger');
                 return;
-            }
-            
-            if (AppState.images.length + files.length > AppState.warningImageCount) {
-                showAlert(`⚠️ Muchas imágenes pueden causar problemas de memoria`, 'warning');
-            }
-            
-            const totalSize = AppState.images.reduce((sum, img) => sum + img.size, 0) +
-                           files.reduce((sum, f) => sum + f.size, 0);
-            if (totalSize > AppState.warningTotalSize) {
-                showAlert(`⚠️ Tamaño total: ${(totalSize / 1024 / 1024).toFixed(0)} MB`, 'warning');
             }
             
             files.forEach(file => {
@@ -2148,62 +1257,70 @@
             showAlert(`✅ ${files.length} imagen(es) cargada(s)`, 'success');
         }
 
-        document.getElementById('downloadAllBtn').addEventListener('click', downloadAll);
-        document.getElementById('applyAllBtn').addEventListener('click', applyConfigToAll);
-        document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+        document.getElementById('downloadAllBtn').addEventListener('click', async () => {
+            const loadedImages = AppState.images.filter(img => img.isLoaded);
+            if (loadedImages.length === 0) {
+                showAlert('No hay imágenes cargadas para descargar', 'warning');
+                return;
+            }
+            
+            let totalParts = 0;
+            for (const img of loadedImages) {
+                const parts = img.getParts();
+                totalParts += parts.length;
+                for (const part of parts) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    img.downloadPart(part);
+                }
+            }
+            
+            showAlert(`✅ ${totalParts} partes de ${loadedImages.length} imágenes descargadas`, 'success');
+        });
 
-        // Theme
+        document.getElementById('clearAllBtn').addEventListener('click', () => {
+            if (!confirm('¿Estás seguro de que quieres eliminar todas las imágenes?')) return;
+            
+            AppState.images.forEach(img => img.dispose());
+            AppState.images = [];
+            AppState.nextId = 1;
+            AppState.globalZoom = 1;
+            
+            document.getElementById('imagesContainer').innerHTML = '';
+            document.getElementById('alertsContainer').innerHTML = '';
+            updateGlobalActions();
+            
+            showAlert('🗑️ Todas las imágenes han sido eliminadas', 'info');
+        });
+
+        // Theme selector
         const themeSelect = document.getElementById('themeSelect');
-        themeSelect.value = currentTheme;
         
         function applyTheme(theme) {
-            if (theme === 'system') {
-                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
             document.body.setAttribute('data-theme', theme);
-            currentTheme = theme;
+            themeSelect.value = theme;
             localStorage.setItem('imageSplitterTheme', theme);
         }
         
-        themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-            if (currentTheme === 'system') applyTheme('system');
+        themeSelect.addEventListener('change', (e) => {
+            applyTheme(e.target.value);
         });
-        applyTheme(currentTheme);
+        
+        const savedTheme = localStorage.getItem('imageSplitterTheme') || 'light';
+        applyTheme(savedTheme);
 
-        // Language
-        const langSelect = document.getElementById('langSelect');
-        langSelect.value = currentLang;
-        langSelect.addEventListener('change', (e) => {
-            currentLang = e.target.value;
-            localStorage.setItem('imageSplitterLang', currentLang);
-            applyTranslations(currentLang);
-        });
-        applyTranslations(currentLang);
-
-        // Tutorial
-        const tutorialModal = document.getElementById('tutorialModal');
-        const helpBtn = document.getElementById('helpBtn');
-        const closeTutorial = document.getElementById('closeTutorial');
-        const closeTutorialBtn = document.getElementById('closeTutorialBtn');
-        const dontShowAgainBtn = document.getElementById('dontShowAgainBtn');
-
-        helpBtn.addEventListener('click', () => tutorialModal.classList.remove('hidden'));
-        closeTutorial.addEventListener('click', () => tutorialModal.classList.add('hidden'));
-        closeTutorialBtn.addEventListener('click', () => tutorialModal.classList.add('hidden'));
-        dontShowAgainBtn.addEventListener('click', () => {
-            localStorage.setItem('imageSplitterTutorialShown', 'true');
-            tutorialModal.classList.add('hidden');
-        });
-        tutorialModal.addEventListener('click', (e) => {
-            if (e.target === tutorialModal) tutorialModal.classList.add('hidden');
+        // Mostrar coordenadas al pasar el mouse sobre el canvas
+        document.addEventListener('mousemove', (e) => {
+            const coordsDisplay = document.getElementById('coordinatesDisplay');
+            if (!coordsDisplay) return;
+            
+            const target = e.target;
+            if (target.classList.contains('preview-canvas') || target.classList.contains('divider-line')) {
+                coordsDisplay.classList.remove('hidden');
+            }
         });
 
-        if (!localStorage.getItem('imageSplitterTutorialShown')) {
-            setTimeout(() => tutorialModal.classList.remove('hidden'), 500);
-        }
-
-        console.log('✂️ Divisor de Imágenes v3.0 - Precisión 100%');
+        console.log('✂️ Divisor de Imágenes - Versión 4.0');
+        console.log('🎯 Precisión 100% - CanvasContainer dimensiones iguales al canvas real');
     </script>
 </body>
 </html>
